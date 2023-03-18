@@ -2,12 +2,10 @@ package service
 
 import (
 	"context"
-	"errors"
 	"fp-rpl/dto"
 	"fp-rpl/entity"
 	"fp-rpl/repository"
 	"fp-rpl/utils"
-	"reflect"
 
 	"github.com/jinzhu/copier"
 )
@@ -21,8 +19,9 @@ type UserService interface {
 	CreateNewUser(ctx context.Context, userDTO dto.UserRegisterRequest) (entity.User, error)
 	GetAllUsers(ctx context.Context) ([]entity.User, error)
 	GetUserByIdentifier(ctx context.Context, identifier string) (entity.User, error)
-	GetUserByUsername(ctx context.Context, username string) (entity.User, error)
+	GetUserByUsernameOrEmail(ctx context.Context, username string, email string) (entity.User, error)
 	UpdateSelfName(ctx context.Context, userDTO dto.UserNameUpdateRequest, id uint64) (entity.User, error)
+	GetUserByID(ctx context.Context, id uint64) (entity.User, error)
 	DeleteSelfUser(ctx context.Context, id uint64) error
 }
 
@@ -47,24 +46,12 @@ func (userS *userService) VerifyLogin(ctx context.Context, identifier string, pa
 }
 
 func (userS *userService) CreateNewUser(ctx context.Context, userDTO dto.UserRegisterRequest) (entity.User, error) {
+	// Fill user role
+	userDTO.Role = "user"
+
 	// Copy UserDTO to empty newly created user var
 	var user entity.User
 	copier.Copy(&user, &userDTO)
-
-	// Check for duplicate Username or Email
-	userCheck, err := userS.userRepository.GetUserByIdentifier(ctx, nil, userDTO.Username, userDTO.Email)
-	if err != nil {
-		return entity.User{}, err
-	}
-
-	// Check if duplicate is found
-	if !(reflect.DeepEqual(userCheck, entity.User{})) {
-		if userCheck.Username == userDTO.Username {
-			return entity.User{}, errors.New("username already exists")
-		} else if userCheck.Email == userDTO.Email {
-			return entity.User{}, errors.New("email already used")
-		}
-	}
 
 	// create new user
 	newUser, err := userS.userRepository.CreateNewUser(ctx, nil, user)
@@ -90,8 +77,16 @@ func (userS *userService) GetUserByIdentifier(ctx context.Context, identifier st
 	return user, nil
 }
 
-func (userS *userService) GetUserByUsername(ctx context.Context, username string) (entity.User, error) {
-	user, err := userS.userRepository.GetUserByIdentifier(ctx, nil, username, "")
+func (userS *userService) GetUserByUsernameOrEmail(ctx context.Context, username string, email string) (entity.User, error) {
+	user, err := userS.userRepository.GetUserByIdentifier(ctx, nil, username, email)
+	if err != nil {
+		return entity.User{}, err
+	}
+	return user, nil
+}
+
+func (userS *userService) GetUserByID(ctx context.Context, id uint64) (entity.User, error) {
+	user, err := userS.userRepository.GetUserByID(ctx, nil, id)
 	if err != nil {
 		return entity.User{}, err
 	}
