@@ -21,6 +21,12 @@ func CreateFailResponse(msg string, statusCode uint) Response {
 	}
 }
 
+func CreateEmptySuccessResponse(msg string, statusCode uint) Response {
+	return Response{
+		IsSuccess: true, Message: msg, Status: statusCode, Data: nil,
+	}
+}
+
 func CreateSuccessResponse(msg string, statusCode uint, d any) Response {
 	return Response{
 		IsSuccess: true, Message: msg, Status: statusCode, Data: d,

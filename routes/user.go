@@ -9,7 +9,7 @@ import (
 )
 
 func UserRoutes(router *gin.Engine, userC controller.UserController) {
-	userRoutes := router.Group("/api/v1/user")
+	userRoutes := router.Group("/api/v1/users")
 	{
 		userRoutes.GET("/", middleware.Authenticate(service.NewJWTService(), "admin"), userC.GetAllUsers)
 		userRoutes.GET("/:username", middleware.Authenticate(service.NewJWTService(), "user"), userC.GetUserByUsername)
