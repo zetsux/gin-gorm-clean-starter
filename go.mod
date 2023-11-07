@@ -1,4 +1,4 @@
-module fp-rpl
+module github.com/zetsux/gin-gorm-template-clean
 
 go 1.20
 
@@ -9,6 +9,8 @@ require (
 	gorm.io/driver/postgres v1.4.8
 	gorm.io/gorm v1.24.5
 )
+
+require github.com/google/uuid v1.4.0
 
 require (
 	github.com/bytedance/sonic v1.8.0 // indirect

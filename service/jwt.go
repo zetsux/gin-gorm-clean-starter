@@ -4,21 +4,20 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
 
 type JWTService interface {
-	GenerateToken(teamID uint64, role string) string
+	GenerateToken(id string, role string) string
 	ValidateToken(token string) (*jwt.Token, error)
-	GetIDByToken(token string) (uint64, error)
+	GetIDByToken(token string) (string, error)
 	GetRoleByToken(token string) (string, error)
 }
 
 type jwtCustomClaim struct {
-	ID   uint64 `json:"id"`
+	ID   string `json:"id"`
 	Role string `json:"role"`
 	jwt.RegisteredClaims
 }
@@ -43,7 +42,7 @@ func getSecretKey() string {
 	return secretKey
 }
 
-func (j *jwtService) GenerateToken(id uint64, role string) string {
+func (j *jwtService) GenerateToken(id string, role string) string {
 	claims := &jwtCustomClaim{
 		id,
 		role,
@@ -70,15 +69,14 @@ func (j *jwtService) ValidateToken(token string) (*jwt.Token, error) {
 	})
 }
 
-func (j *jwtService) GetIDByToken(token string) (uint64, error) {
+func (j *jwtService) GetIDByToken(token string) (string, error) {
 	t_Token, err := j.ValidateToken(token)
 	if err != nil {
-		return 0, err
+		return "", err
 	}
 	claims := t_Token.Claims.(jwt.MapClaims)
 	id := fmt.Sprintf("%v", claims["id"])
-	ID, _ := strconv.ParseUint(id, 10, 64)
-	return ID, nil
+	return id, nil
 }
 
 func (j *jwtService) GetRoleByToken(token string) (string, error) {

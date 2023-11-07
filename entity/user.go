@@ -1,8 +1,8 @@
 package entity
 
 import (
-	"fp-rpl/common"
-	"fp-rpl/utils"
+	"github.com/zetsux/gin-gorm-template-clean/common"
+	"github.com/zetsux/gin-gorm-template-clean/utils"
 
 	"gorm.io/gorm"
 )

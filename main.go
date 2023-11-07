@@ -1,40 +1,28 @@
 package main
 
 import (
-	"fmt"
-	"fp-rpl/config"
-	"fp-rpl/controller"
-	"fp-rpl/middleware"
-	"fp-rpl/repository"
-	"fp-rpl/routes"
-	"fp-rpl/service"
 	"os"
 
+	"github.com/zetsux/gin-gorm-template-clean/config"
+	"github.com/zetsux/gin-gorm-template-clean/controller"
+	"github.com/zetsux/gin-gorm-template-clean/middleware"
+	"github.com/zetsux/gin-gorm-template-clean/repository"
+	"github.com/zetsux/gin-gorm-template-clean/routes"
+	"github.com/zetsux/gin-gorm-template-clean/service"
+	"gorm.io/gorm"
+
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 )
 
 func main() {
-	if os.Getenv("APP_ENV") != "production" {
-		err := godotenv.Load(".env")
-		if err != nil {
-			fmt.Println(err)
-			panic(err)
-		}
-	}
+	var (
+		db   *gorm.DB           = config.DBSetup()
+		jwtS service.JWTService = service.NewJWTService()
 
-	// Setting Up Database
-	db := config.DBSetup()
-
-	// Setting Up Repositories
-	userR := repository.NewUserRepository(db)
-
-	// Setting Up Services
-	userS := service.NewUserService(userR)
-	jwtS := service.NewJWTService()
-
-	// Setting Up Controllers
-	userC := controller.NewUserController(userS, jwtS)
+		userR repository.UserRepository = repository.NewUserRepository(db)
+		userS service.UserService       = service.NewUserService(userR)
+		userC controller.UserController = controller.NewUserController(userS, jwtS)
+	)
 
 	defer config.DBClose(db)
 
@@ -45,7 +33,7 @@ func main() {
 	)
 
 	// Setting Up Routes
-	routes.UserRoutes(server, userC)
+	routes.UserRoutes(server, userC, jwtS)
 
 	// Running in localhost:8080
 	port := os.Getenv("PORT")

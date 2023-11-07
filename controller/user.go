@@ -1,12 +1,13 @@
 package controller
 
 import (
-	"fp-rpl/common"
-	"fp-rpl/dto"
-	"fp-rpl/entity"
-	"fp-rpl/service"
 	"net/http"
 	"reflect"
+
+	"github.com/zetsux/gin-gorm-template-clean/common"
+	"github.com/zetsux/gin-gorm-template-clean/dto"
+	"github.com/zetsux/gin-gorm-template-clean/entity"
+	"github.com/zetsux/gin-gorm-template-clean/service"
 
 	"github.com/gin-gonic/gin"
 )
@@ -37,36 +38,14 @@ func (userC *userController) Register(ctx *gin.Context) {
 	var userDTO dto.UserRegisterRequest
 	err := ctx.ShouldBind(&userDTO)
 	if err != nil {
-		resp := common.CreateFailResponse("Failed to process user register request", http.StatusBadRequest)
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, resp)
-		return
-	}
-
-	// Check for duplicate Username or Email
-	userCheck, err := userC.userService.GetUserByUsernameOrEmail(ctx, userDTO.Username, userDTO.Email)
-	if err != nil {
-		resp := common.CreateFailResponse("Failed to process user register request", http.StatusBadRequest)
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, resp)
-		return
-	}
-
-	// Check if duplicate is found
-	if !(reflect.DeepEqual(userCheck, entity.User{})) {
-		var resp common.Response
-		if userCheck.Username == userDTO.Username && userCheck.Email == userDTO.Email {
-			resp = common.CreateFailResponse("Username and Email are already used", http.StatusBadRequest)
-		} else if userCheck.Username == userDTO.Username {
-			resp = common.CreateFailResponse("Username is already used", http.StatusBadRequest)
-		} else if userCheck.Email == userDTO.Email {
-			resp = common.CreateFailResponse("Email is already used", http.StatusBadRequest)
-		}
+		resp := common.CreateFailResponse("Failed to process user register request", err.Error(), http.StatusBadRequest)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, resp)
 		return
 	}
 
 	newUser, err := userC.userService.CreateNewUser(ctx, userDTO)
 	if err != nil {
-		resp := common.CreateFailResponse("Failed to process user register request", http.StatusBadRequest)
+		resp := common.CreateFailResponse("Failed to process user register request", err.Error(), http.StatusBadRequest)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, resp)
 		return
 	}
@@ -79,21 +58,21 @@ func (userC *userController) Login(ctx *gin.Context) {
 	var userDTO dto.UserLoginRequest
 	err := ctx.ShouldBind(&userDTO)
 	if err != nil {
-		resp := common.CreateFailResponse("Failed to process user login request", http.StatusBadRequest)
+		resp := common.CreateFailResponse("Failed to process user login request", err.Error(), http.StatusBadRequest)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, resp)
 		return
 	}
 
 	res := userC.userService.VerifyLogin(ctx.Request.Context(), userDTO.UserIdentifier, userDTO.Password)
 	if !res {
-		response := common.CreateFailResponse("Entered credentials invalid", http.StatusBadRequest)
+		response := common.CreateFailResponse("Entered credentials invalid", err.Error(), http.StatusBadRequest)
 		ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
 		return
 	}
 
 	user, err := userC.userService.GetUserByIdentifier(ctx.Request.Context(), userDTO.UserIdentifier)
 	if err != nil {
-		response := common.CreateFailResponse("Failed to process user login request", http.StatusBadRequest)
+		response := common.CreateFailResponse("Failed to process user login request", err.Error(), http.StatusBadRequest)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
@@ -107,7 +86,7 @@ func (userC *userController) Login(ctx *gin.Context) {
 func (userC *userController) GetAllUsers(ctx *gin.Context) {
 	users, err := userC.userService.GetAllUsers(ctx)
 	if err != nil {
-		resp := common.CreateFailResponse("Failed to fetch all users", http.StatusBadRequest)
+		resp := common.CreateFailResponse("Failed to fetch all users", err.Error(), http.StatusBadRequest)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, resp)
 		return
 	}
@@ -125,7 +104,7 @@ func (userC *userController) GetUserByUsername(ctx *gin.Context) {
 	username := ctx.Param("username")
 	user, err := userC.userService.GetUserByIdentifier(ctx, username)
 	if err != nil {
-		resp := common.CreateFailResponse("Failed to fetch user", http.StatusBadRequest)
+		resp := common.CreateFailResponse("Failed to fetch user", err.Error(), http.StatusBadRequest)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, resp)
 		return
 	}
@@ -140,10 +119,10 @@ func (userC *userController) GetUserByUsername(ctx *gin.Context) {
 }
 
 func (userC *userController) GetMe(ctx *gin.Context) {
-	id := ctx.GetUint64("ID")
+	id := ctx.MustGet("ID").(string)
 	user, err := userC.userService.GetUserByID(ctx, id)
 	if err != nil {
-		resp := common.CreateFailResponse("Failed to fetch user", http.StatusBadRequest)
+		resp := common.CreateFailResponse("Failed to fetch user", err.Error(), http.StatusBadRequest)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, resp)
 		return
 	}
@@ -161,15 +140,15 @@ func (userC *userController) UpdateSelfName(ctx *gin.Context) {
 	var userDTO dto.UserNameUpdateRequest
 	err := ctx.ShouldBind(&userDTO)
 	if err != nil {
-		resp := common.CreateFailResponse("Failed to process user name update request", http.StatusBadRequest)
+		resp := common.CreateFailResponse("Failed to process user name update request", err.Error(), http.StatusBadRequest)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, resp)
 		return
 	}
 
-	id := ctx.GetUint64("ID")
+	id := ctx.MustGet("ID").(string)
 	user, err := userC.userService.UpdateSelfName(ctx, userDTO, id)
 	if err != nil {
-		resp := common.CreateFailResponse(err.Error(), http.StatusBadRequest)
+		resp := common.CreateFailResponse("Failed to process user name update request", err.Error(), http.StatusBadRequest)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, resp)
 		return
 	}
@@ -184,10 +163,10 @@ func (userC *userController) UpdateSelfName(ctx *gin.Context) {
 }
 
 func (userC *userController) DeleteSelfUser(ctx *gin.Context) {
-	id := ctx.GetUint64("ID")
+	id := ctx.MustGet("ID").(string)
 	err := userC.userService.DeleteSelfUser(ctx, id)
 	if err != nil {
-		resp := common.CreateFailResponse("Failed to delete user", http.StatusBadRequest)
+		resp := common.CreateFailResponse("Failed to delete user", err.Error(), http.StatusBadRequest)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, resp)
 		return
 	}

@@ -2,8 +2,9 @@ package config
 
 import (
 	"fmt"
-	"fp-rpl/entity"
 	"os"
+
+	"github.com/zetsux/gin-gorm-template-clean/entity"
 
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
@@ -32,13 +33,7 @@ func DBSetup() *gorm.DB {
 		panic(err)
 	}
 
-	err = db.AutoMigrate(
-		entity.User{},
-	)
-	if err != nil {
-		fmt.Println(err)
-		panic(err)
-	}
+	DBMigrate(db)
 
 	return db
 }
@@ -50,4 +45,15 @@ func DBClose(db *gorm.DB) {
 		panic(err)
 	}
 	dbSQL.Close()
+}
+
+func DBMigrate(db *gorm.DB) {
+	err := db.AutoMigrate(
+		entity.User{},
+	)
+
+	if err != nil {
+		fmt.Println(err)
+		panic(err)
+	}
 }

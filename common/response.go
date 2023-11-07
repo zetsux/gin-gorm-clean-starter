@@ -3,6 +3,7 @@ package common
 type Response struct {
 	IsSuccess bool   `json:"success"`
 	Message   string `json:"message"`
+	Error     string `json:"error,omitempty"`
 	Status    uint   `json:"status"`
 	Data      any    `json:"data"`
 }
@@ -15,15 +16,9 @@ type AuthResponse struct {
 type EmptyObj struct {
 }
 
-func CreateFailResponse(msg string, statusCode uint) Response {
+func CreateFailResponse(msg string, err string, statusCode uint) Response {
 	return Response{
-		IsSuccess: false, Message: msg, Status: statusCode, Data: nil,
-	}
-}
-
-func CreateEmptySuccessResponse(msg string, statusCode uint) Response {
-	return Response{
-		IsSuccess: true, Message: msg, Status: statusCode, Data: nil,
+		IsSuccess: false, Message: msg, Error: err, Status: statusCode, Data: nil,
 	}
 }
 
