@@ -18,12 +18,13 @@ type userService struct {
 
 type UserService interface {
 	VerifyLogin(ctx context.Context, email string, password string) bool
-	CreateNewUser(ctx context.Context, userDTO dto.UserRegisterRequest) (dto.UserResponse, error)
+	CreateNewUser(ctx context.Context, ud dto.UserRegisterRequest) (dto.UserResponse, error)
 	GetAllUsers(ctx context.Context) ([]dto.UserResponse, error)
 	GetUserByEmail(ctx context.Context, email string) (dto.UserResponse, error)
-	UpdateSelfName(ctx context.Context, userDTO dto.UserNameUpdateRequest, id string) (dto.UserResponse, error)
+	UpdateSelfName(ctx context.Context, ud dto.UserNameUpdateRequest, id string) (dto.UserResponse, error)
+	UpdateUserById(ctx context.Context, ud dto.UserUpdateRequest, id string) (dto.UserResponse, error)
 	GetUserByID(ctx context.Context, id string) (dto.UserResponse, error)
-	DeleteSelfUser(ctx context.Context, id string) error
+	DeleteUserById(ctx context.Context, id string) error
 }
 
 func NewUserService(userR repository.UserRepository) UserService {
@@ -46,8 +47,8 @@ func (userS *userService) VerifyLogin(ctx context.Context, email string, passwor
 	return false
 }
 
-func (userS *userService) CreateNewUser(ctx context.Context, userDTO dto.UserRegisterRequest) (dto.UserResponse, error) {
-	userCheck, err := userS.userRepository.GetUserByEmail(ctx, nil, userDTO.Email)
+func (userS *userService) CreateNewUser(ctx context.Context, ud dto.UserRegisterRequest) (dto.UserResponse, error) {
+	userCheck, err := userS.userRepository.GetUserByEmail(ctx, nil, ud.Email)
 	if err != nil {
 		return dto.UserResponse{}, err
 	}
@@ -57,11 +58,11 @@ func (userS *userService) CreateNewUser(ctx context.Context, userDTO dto.UserReg
 	}
 
 	// Fill user role
-	userDTO.Role = "user"
+	ud.Role = "user"
 
 	// Copy UserDTO to empty newly created user var
 	var user entity.User
-	copier.Copy(&user, &userDTO)
+	copier.Copy(&user, &ud)
 
 	// create new user
 	newUser, err := userS.userRepository.CreateNewUser(ctx, nil, user)
@@ -124,13 +125,13 @@ func (userS *userService) GetUserByID(ctx context.Context, id string) (dto.UserR
 	}, nil
 }
 
-func (userS *userService) UpdateSelfName(ctx context.Context, userDTO dto.UserNameUpdateRequest, id string) (dto.UserResponse, error) {
+func (userS *userService) UpdateSelfName(ctx context.Context, ud dto.UserNameUpdateRequest, id string) (dto.UserResponse, error) {
 	user, err := userS.userRepository.GetUserByID(ctx, nil, id)
 	if err != nil {
 		return dto.UserResponse{}, err
 	}
 
-	user, err = userS.userRepository.UpdateNameUser(ctx, nil, userDTO.Name, user)
+	user, err = userS.userRepository.UpdateNameUser(ctx, nil, ud.Name, user)
 	if err != nil {
 		return dto.UserResponse{}, err
 	}
@@ -143,7 +144,59 @@ func (userS *userService) UpdateSelfName(ctx context.Context, userDTO dto.UserNa
 	}, nil
 }
 
-func (userS *userService) DeleteSelfUser(ctx context.Context, id string) error {
+func (userS *userService) UpdateUserById(ctx context.Context, ud dto.UserUpdateRequest, id string) (dto.UserResponse, error) {
+	user, err := userS.userRepository.GetUserByID(ctx, nil, id)
+	if err != nil {
+		return dto.UserResponse{}, err
+	}
+
+	if reflect.DeepEqual(user, entity.User{}) {
+		return dto.UserResponse{}, dto.ErrUserNotFound
+	}
+
+	if ud.Email != "" && ud.Email != user.Email {
+		us, err := userS.userRepository.GetUserByEmail(ctx, nil, ud.Email)
+		if err != nil {
+			return dto.UserResponse{}, err
+		}
+
+		if !(reflect.DeepEqual(us, entity.User{})) {
+			return dto.UserResponse{}, dto.ErrEmailAlreadyExists
+		}
+	}
+
+	userEdit := entity.User{
+		Name:     ud.Name,
+		Email:    ud.Email,
+		Role:     ud.Role,
+		Password: ud.Password,
+	}
+	userEdit.ID = user.ID
+
+	edited, err := userS.userRepository.UpdateUser(ctx, nil, userEdit)
+	if err != nil {
+		return dto.UserResponse{}, err
+	}
+
+	if edited.Name == "" {
+		edited.Name = user.Name
+	}
+	if edited.Email == "" {
+		edited.Email = user.Email
+	}
+	if edited.Role == "" {
+		edited.Role = user.Role
+	}
+
+	return dto.UserResponse{
+		ID:    edited.ID.String(),
+		Name:  edited.Name,
+		Email: edited.Email,
+		Role:  edited.Role,
+	}, nil
+}
+
+func (userS *userService) DeleteUserById(ctx context.Context, id string) error {
 	userCheck, err := userS.userRepository.GetUserByID(ctx, nil, id)
 	if err != nil {
 		return err

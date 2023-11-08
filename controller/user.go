@@ -23,7 +23,9 @@ type UserController interface {
 	GetAllUsers(ctx *gin.Context)
 	GetMe(ctx *gin.Context)
 	UpdateSelfName(ctx *gin.Context)
+	UpdateUserById(ctx *gin.Context)
 	DeleteSelfUser(ctx *gin.Context)
+	DeleteUserById(ctx *gin.Context)
 }
 
 func NewUserController(userS service.UserService, jwtS service.JWTService) UserController {
@@ -64,15 +66,15 @@ func (userC *userController) Login(ctx *gin.Context) {
 
 	res := userC.userService.VerifyLogin(ctx.Request.Context(), userDTO.Email, userDTO.Password)
 	if !res {
-		response := common.CreateFailResponse("Entered credentials invalid", err.Error(), http.StatusBadRequest)
-		ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
+		resp := common.CreateFailResponse("Entered credentials invalid", "", http.StatusBadRequest)
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized, resp)
 		return
 	}
 
 	user, err := userC.userService.GetUserByEmail(ctx.Request.Context(), userDTO.Email)
 	if err != nil {
-		response := common.CreateFailResponse("Failed to process user login request", err.Error(), http.StatusBadRequest)
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
+		resp := common.CreateFailResponse("Failed to process user login request", err.Error(), http.StatusBadRequest)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, resp)
 		return
 	}
 
@@ -143,9 +145,49 @@ func (userC *userController) UpdateSelfName(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, resp)
 }
 
+func (userC *userController) UpdateUserById(ctx *gin.Context) {
+	id := ctx.Param("user_id")
+
+	var userDTO dto.UserUpdateRequest
+	err := ctx.ShouldBind(&userDTO)
+	if err != nil {
+		resp := common.CreateFailResponse("Failed to process user update request", err.Error(), http.StatusBadRequest)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, resp)
+		return
+	}
+
+	user, err := userC.userService.UpdateUserById(ctx, userDTO, id)
+	if err != nil {
+		resp := common.CreateFailResponse("Failed to process user update request", err.Error(), http.StatusBadRequest)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, resp)
+		return
+	}
+
+	var resp common.Response
+	if reflect.DeepEqual(user, entity.User{}) {
+		resp = common.CreateSuccessResponse("User not found", http.StatusOK, nil)
+	} else {
+		resp = common.CreateSuccessResponse("Successfully updated user", http.StatusOK, user)
+	}
+	ctx.JSON(http.StatusOK, resp)
+}
+
 func (userC *userController) DeleteSelfUser(ctx *gin.Context) {
 	id := ctx.MustGet("ID").(string)
-	err := userC.userService.DeleteSelfUser(ctx, id)
+	err := userC.userService.DeleteUserById(ctx, id)
+	if err != nil {
+		resp := common.CreateFailResponse("Failed to delete user", err.Error(), http.StatusBadRequest)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, resp)
+		return
+	}
+
+	resp := common.CreateSuccessResponse("Successfully deleted user", http.StatusOK, nil)
+	ctx.JSON(http.StatusOK, resp)
+}
+
+func (userC *userController) DeleteUserById(ctx *gin.Context) {
+	id := ctx.Param("user_id")
+	err := userC.userService.DeleteUserById(ctx, id)
 	if err != nil {
 		resp := common.CreateFailResponse("Failed to delete user", err.Error(), http.StatusBadRequest)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, resp)
