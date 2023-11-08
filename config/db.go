@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/zetsux/gin-gorm-template-clean/entity"
+	"github.com/zetsux/gin-gorm-template-clean/seeder"
 
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
@@ -34,6 +35,7 @@ func DBSetup() *gorm.DB {
 	}
 
 	DBMigrate(db)
+	DBSeed(db)
 
 	return db
 }
@@ -54,6 +56,12 @@ func DBMigrate(db *gorm.DB) {
 
 	if err != nil {
 		fmt.Println(err)
+		panic(err)
+	}
+}
+
+func DBSeed(db *gorm.DB) {
+	if err := seeder.Seed(db); err != nil {
 		panic(err)
 	}
 }
