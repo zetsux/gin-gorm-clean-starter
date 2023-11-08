@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -40,7 +39,6 @@ func Authenticate(jwtService service.JWTService, role string) gin.HandlerFunc {
 
 		// get role from token
 		roleRes, err := jwtService.GetRoleByToken(string(authHeader))
-		fmt.Println("ROLE", roleRes)
 		if err != nil || (roleRes != "admin" && roleRes != role) {
 			response := common.CreateFailResponse("Action unauthorized", "", http.StatusUnauthorized)
 			c.AbortWithStatusJSON(http.StatusForbidden, response)
@@ -54,7 +52,6 @@ func Authenticate(jwtService service.JWTService, role string) gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
 			return
 		}
-		fmt.Println("ROLE", roleRes)
 		c.Set("ID", idRes)
 		c.Next()
 	}

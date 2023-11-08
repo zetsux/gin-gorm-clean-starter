@@ -21,7 +21,7 @@ type UserRepository interface {
 
 	// functional
 	CreateNewUser(ctx context.Context, tx *gorm.DB, user entity.User) (entity.User, error)
-	GetUserByIdentifier(ctx context.Context, tx *gorm.DB, username string, email string) (entity.User, error)
+	GetUserByEmail(ctx context.Context, tx *gorm.DB, email string) (entity.User, error)
 	GetUserByID(ctx context.Context, tx *gorm.DB, id string) (entity.User, error)
 	GetAllUsers(ctx context.Context, tx *gorm.DB) ([]entity.User, error)
 	UpdateNameUser(ctx context.Context, tx *gorm.DB, name string, user entity.User) (entity.User, error)
@@ -67,14 +67,14 @@ func (userR *userRepository) CreateNewUser(ctx context.Context, tx *gorm.DB, use
 	return user, nil
 }
 
-func (userR *userRepository) GetUserByIdentifier(ctx context.Context, tx *gorm.DB, username string, email string) (entity.User, error) {
+func (userR *userRepository) GetUserByEmail(ctx context.Context, tx *gorm.DB, email string) (entity.User, error) {
 	var err error
 	var user entity.User
 	if tx == nil {
-		tx = userR.db.WithContext(ctx).Debug().Where("username = $1 OR email = $2", username, email).Take(&user)
+		tx = userR.db.WithContext(ctx).Debug().Where("email = $1", email).Take(&user)
 		err = tx.Error
 	} else {
-		err = tx.WithContext(ctx).Debug().Where("username = $1 OR email = $2", username, email).Take(&user).Error
+		err = tx.WithContext(ctx).Debug().Where("email = $1", email).Take(&user).Error
 	}
 
 	if err != nil && !(errors.Is(err, gorm.ErrRecordNotFound)) {
@@ -136,10 +136,10 @@ func (userR *userRepository) UpdateNameUser(ctx context.Context, tx *gorm.DB, na
 func (userR *userRepository) DeleteUserByID(ctx context.Context, tx *gorm.DB, id string) error {
 	var err error
 	if tx == nil {
-		tx = userR.db.WithContext(ctx).Debug().Delete(&entity.User{}, id)
+		tx = userR.db.WithContext(ctx).Debug().Delete(&entity.User{}, &id)
 		err = tx.Error
 	} else {
-		err = tx.WithContext(ctx).Debug().Delete(&entity.User{}, id).Error
+		err = tx.WithContext(ctx).Debug().Delete(&entity.User{}, &id).Error
 	}
 
 	if err != nil && !(errors.Is(err, gorm.ErrRecordNotFound)) {

@@ -21,7 +21,6 @@ type UserController interface {
 	Register(ctx *gin.Context)
 	Login(ctx *gin.Context)
 	GetAllUsers(ctx *gin.Context)
-	GetUserByUsername(ctx *gin.Context)
 	GetMe(ctx *gin.Context)
 	UpdateSelfName(ctx *gin.Context)
 	DeleteSelfUser(ctx *gin.Context)
@@ -63,14 +62,14 @@ func (userC *userController) Login(ctx *gin.Context) {
 		return
 	}
 
-	res := userC.userService.VerifyLogin(ctx.Request.Context(), userDTO.UserIdentifier, userDTO.Password)
+	res := userC.userService.VerifyLogin(ctx.Request.Context(), userDTO.Email, userDTO.Password)
 	if !res {
 		response := common.CreateFailResponse("Entered credentials invalid", err.Error(), http.StatusBadRequest)
 		ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
 		return
 	}
 
-	user, err := userC.userService.GetUserByIdentifier(ctx.Request.Context(), userDTO.UserIdentifier)
+	user, err := userC.userService.GetUserByEmail(ctx.Request.Context(), userDTO.Email)
 	if err != nil {
 		response := common.CreateFailResponse("Failed to process user login request", err.Error(), http.StatusBadRequest)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
@@ -96,24 +95,6 @@ func (userC *userController) GetAllUsers(ctx *gin.Context) {
 		resp = common.CreateSuccessResponse("No user found", http.StatusOK, users)
 	} else {
 		resp = common.CreateSuccessResponse("Successfully fetched all users", http.StatusOK, users)
-	}
-	ctx.JSON(http.StatusOK, resp)
-}
-
-func (userC *userController) GetUserByUsername(ctx *gin.Context) {
-	username := ctx.Param("username")
-	user, err := userC.userService.GetUserByIdentifier(ctx, username)
-	if err != nil {
-		resp := common.CreateFailResponse("Failed to fetch user", err.Error(), http.StatusBadRequest)
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, resp)
-		return
-	}
-
-	var resp common.Response
-	if reflect.DeepEqual(user, entity.User{}) {
-		resp = common.CreateSuccessResponse("User not found", http.StatusOK, nil)
-	} else {
-		resp = common.CreateSuccessResponse("Successfully fetched user", http.StatusOK, user)
 	}
 	ctx.JSON(http.StatusOK, resp)
 }

@@ -13,8 +13,8 @@ func UserRoutes(router *gin.Engine, userC controller.UserController, jwtS servic
 	{
 		userRoutes.GET("", middleware.Authenticate(jwtS, "admin"), userC.GetAllUsers)
 		userRoutes.GET("/me", middleware.Authenticate(jwtS, "user"), userC.GetMe)
-		userRoutes.PUT("/name", middleware.Authenticate(jwtS, "user"), userC.UpdateSelfName)
-		userRoutes.DELETE("", middleware.Authenticate(jwtS, "user"), userC.DeleteSelfUser)
+		userRoutes.PATCH("/me/name", middleware.Authenticate(jwtS, "user"), userC.UpdateSelfName)
+		userRoutes.DELETE("/me", middleware.Authenticate(jwtS, "user"), userC.DeleteSelfUser)
 		userRoutes.POST("", userC.Register)
 		userRoutes.POST("/login", userC.Login)
 	}
