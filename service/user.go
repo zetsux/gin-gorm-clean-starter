@@ -31,8 +31,8 @@ func NewUserService(userR repository.UserRepository) UserService {
 	return &userService{userRepository: userR}
 }
 
-func (userS *userService) VerifyLogin(ctx context.Context, email string, password string) bool {
-	userCheck, err := userS.userRepository.GetUserByEmail(ctx, nil, email)
+func (us *userService) VerifyLogin(ctx context.Context, email string, password string) bool {
+	userCheck, err := us.userRepository.GetUserByEmail(ctx, nil, email)
 	if err != nil {
 		return false
 	}
@@ -47,8 +47,8 @@ func (userS *userService) VerifyLogin(ctx context.Context, email string, passwor
 	return false
 }
 
-func (userS *userService) CreateNewUser(ctx context.Context, ud dto.UserRegisterRequest) (dto.UserResponse, error) {
-	userCheck, err := userS.userRepository.GetUserByEmail(ctx, nil, ud.Email)
+func (us *userService) CreateNewUser(ctx context.Context, ud dto.UserRegisterRequest) (dto.UserResponse, error) {
+	userCheck, err := us.userRepository.GetUserByEmail(ctx, nil, ud.Email)
 	if err != nil {
 		return dto.UserResponse{}, err
 	}
@@ -65,7 +65,7 @@ func (userS *userService) CreateNewUser(ctx context.Context, ud dto.UserRegister
 	copier.Copy(&user, &ud)
 
 	// create new user
-	newUser, err := userS.userRepository.CreateNewUser(ctx, nil, user)
+	newUser, err := us.userRepository.CreateNewUser(ctx, nil, user)
 	if err != nil {
 		return dto.UserResponse{}, err
 	}
@@ -78,15 +78,14 @@ func (userS *userService) CreateNewUser(ctx context.Context, ud dto.UserRegister
 	}, nil
 }
 
-func (userS *userService) GetAllUsers(ctx context.Context) ([]dto.UserResponse, error) {
-	users, err := userS.userRepository.GetAllUsers(ctx, nil)
+func (us *userService) GetAllUsers(ctx context.Context) (userResp []dto.UserResponse, err error) {
+	users, err := us.userRepository.GetAllUsers(ctx, nil)
 	if err != nil {
 		return []dto.UserResponse{}, err
 	}
 
-	var userResponse []dto.UserResponse
 	for _, user := range users {
-		userResponse = append(userResponse, dto.UserResponse{
+		userResp = append(userResp, dto.UserResponse{
 			ID:    user.ID.String(),
 			Name:  user.Name,
 			Email: user.Email,
@@ -94,11 +93,11 @@ func (userS *userService) GetAllUsers(ctx context.Context) ([]dto.UserResponse, 
 		})
 	}
 
-	return userResponse, nil
+	return userResp, nil
 }
 
-func (userS *userService) GetUserByEmail(ctx context.Context, email string) (dto.UserResponse, error) {
-	user, err := userS.userRepository.GetUserByEmail(ctx, nil, email)
+func (us *userService) GetUserByEmail(ctx context.Context, email string) (dto.UserResponse, error) {
+	user, err := us.userRepository.GetUserByEmail(ctx, nil, email)
 	if err != nil {
 		return dto.UserResponse{}, err
 	}
@@ -111,8 +110,8 @@ func (userS *userService) GetUserByEmail(ctx context.Context, email string) (dto
 	}, nil
 }
 
-func (userS *userService) GetUserByID(ctx context.Context, id string) (dto.UserResponse, error) {
-	user, err := userS.userRepository.GetUserByID(ctx, nil, id)
+func (us *userService) GetUserByID(ctx context.Context, id string) (dto.UserResponse, error) {
+	user, err := us.userRepository.GetUserByID(ctx, nil, id)
 	if err != nil {
 		return dto.UserResponse{}, err
 	}
@@ -125,13 +124,13 @@ func (userS *userService) GetUserByID(ctx context.Context, id string) (dto.UserR
 	}, nil
 }
 
-func (userS *userService) UpdateSelfName(ctx context.Context, ud dto.UserNameUpdateRequest, id string) (dto.UserResponse, error) {
-	user, err := userS.userRepository.GetUserByID(ctx, nil, id)
+func (us *userService) UpdateSelfName(ctx context.Context, ud dto.UserNameUpdateRequest, id string) (dto.UserResponse, error) {
+	user, err := us.userRepository.GetUserByID(ctx, nil, id)
 	if err != nil {
 		return dto.UserResponse{}, err
 	}
 
-	user, err = userS.userRepository.UpdateNameUser(ctx, nil, ud.Name, user)
+	user, err = us.userRepository.UpdateNameUser(ctx, nil, ud.Name, user)
 	if err != nil {
 		return dto.UserResponse{}, err
 	}
@@ -144,8 +143,8 @@ func (userS *userService) UpdateSelfName(ctx context.Context, ud dto.UserNameUpd
 	}, nil
 }
 
-func (userS *userService) UpdateUserById(ctx context.Context, ud dto.UserUpdateRequest, id string) (dto.UserResponse, error) {
-	user, err := userS.userRepository.GetUserByID(ctx, nil, id)
+func (us *userService) UpdateUserById(ctx context.Context, ud dto.UserUpdateRequest, id string) (dto.UserResponse, error) {
+	user, err := us.userRepository.GetUserByID(ctx, nil, id)
 	if err != nil {
 		return dto.UserResponse{}, err
 	}
@@ -155,7 +154,7 @@ func (userS *userService) UpdateUserById(ctx context.Context, ud dto.UserUpdateR
 	}
 
 	if ud.Email != "" && ud.Email != user.Email {
-		us, err := userS.userRepository.GetUserByEmail(ctx, nil, ud.Email)
+		us, err := us.userRepository.GetUserByEmail(ctx, nil, ud.Email)
 		if err != nil {
 			return dto.UserResponse{}, err
 		}
@@ -173,7 +172,7 @@ func (userS *userService) UpdateUserById(ctx context.Context, ud dto.UserUpdateR
 	}
 	userEdit.ID = user.ID
 
-	edited, err := userS.userRepository.UpdateUser(ctx, nil, userEdit)
+	edited, err := us.userRepository.UpdateUser(ctx, nil, userEdit)
 	if err != nil {
 		return dto.UserResponse{}, err
 	}
@@ -196,8 +195,8 @@ func (userS *userService) UpdateUserById(ctx context.Context, ud dto.UserUpdateR
 	}, nil
 }
 
-func (userS *userService) DeleteUserById(ctx context.Context, id string) error {
-	userCheck, err := userS.userRepository.GetUserByID(ctx, nil, id)
+func (us *userService) DeleteUserById(ctx context.Context, id string) error {
+	userCheck, err := us.userRepository.GetUserByID(ctx, nil, id)
 	if err != nil {
 		return err
 	}
@@ -206,7 +205,7 @@ func (userS *userService) DeleteUserById(ctx context.Context, id string) error {
 		return dto.ErrUserNotFound
 	}
 
-	err = userS.userRepository.DeleteUserByID(ctx, nil, id)
+	err = us.userRepository.DeleteUserByID(ctx, nil, id)
 	if err != nil {
 		return err
 	}

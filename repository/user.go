@@ -33,15 +33,15 @@ func NewUserRepository(db *gorm.DB) *userRepository {
 	return &userRepository{db: db}
 }
 
-func (userR *userRepository) BeginTx(ctx context.Context) (*gorm.DB, error) {
-	tx := userR.db.WithContext(ctx).Begin()
+func (ur *userRepository) BeginTx(ctx context.Context) (*gorm.DB, error) {
+	tx := ur.db.WithContext(ctx).Begin()
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
 	return tx, nil
 }
 
-func (userR *userRepository) CommitTx(ctx context.Context, tx *gorm.DB) error {
+func (ur *userRepository) CommitTx(ctx context.Context, tx *gorm.DB) error {
 	err := tx.WithContext(ctx).Commit().Error
 	if err == nil {
 		return err
@@ -49,14 +49,14 @@ func (userR *userRepository) CommitTx(ctx context.Context, tx *gorm.DB) error {
 	return nil
 }
 
-func (userR *userRepository) RollbackTx(ctx context.Context, tx *gorm.DB) {
+func (ur *userRepository) RollbackTx(ctx context.Context, tx *gorm.DB) {
 	tx.WithContext(ctx).Debug().Rollback()
 }
 
-func (userR *userRepository) CreateNewUser(ctx context.Context, tx *gorm.DB, user entity.User) (entity.User, error) {
+func (ur *userRepository) CreateNewUser(ctx context.Context, tx *gorm.DB, user entity.User) (entity.User, error) {
 	var err error
 	if tx == nil {
-		tx = userR.db.WithContext(ctx).Debug().Create(&user)
+		tx = ur.db.WithContext(ctx).Debug().Create(&user)
 		err = tx.Error
 	} else {
 		err = tx.WithContext(ctx).Debug().Create(&user).Error
@@ -68,11 +68,11 @@ func (userR *userRepository) CreateNewUser(ctx context.Context, tx *gorm.DB, use
 	return user, nil
 }
 
-func (userR *userRepository) GetUserByEmail(ctx context.Context, tx *gorm.DB, email string) (entity.User, error) {
+func (ur *userRepository) GetUserByEmail(ctx context.Context, tx *gorm.DB, email string) (entity.User, error) {
 	var err error
 	var user entity.User
 	if tx == nil {
-		tx = userR.db.WithContext(ctx).Debug().Where("email = $1", email).Take(&user)
+		tx = ur.db.WithContext(ctx).Debug().Where("email = $1", email).Take(&user)
 		err = tx.Error
 	} else {
 		err = tx.WithContext(ctx).Debug().Where("email = $1", email).Take(&user).Error
@@ -84,11 +84,11 @@ func (userR *userRepository) GetUserByEmail(ctx context.Context, tx *gorm.DB, em
 	return user, nil
 }
 
-func (userR *userRepository) GetUserByID(ctx context.Context, tx *gorm.DB, id string) (entity.User, error) {
+func (ur *userRepository) GetUserByID(ctx context.Context, tx *gorm.DB, id string) (entity.User, error) {
 	var err error
 	var user entity.User
 	if tx == nil {
-		tx = userR.db.WithContext(ctx).Debug().Where("id = $1", id).Take(&user)
+		tx = ur.db.WithContext(ctx).Debug().Where("id = $1", id).Take(&user)
 		err = tx.Error
 	} else {
 		err = tx.WithContext(ctx).Debug().Where("id = $1", id).Take(&user).Error
@@ -100,12 +100,12 @@ func (userR *userRepository) GetUserByID(ctx context.Context, tx *gorm.DB, id st
 	return user, nil
 }
 
-func (userR *userRepository) GetAllUsers(ctx context.Context, tx *gorm.DB) ([]entity.User, error) {
+func (ur *userRepository) GetAllUsers(ctx context.Context, tx *gorm.DB) ([]entity.User, error) {
 	var err error
 	var users []entity.User
 
 	if tx == nil {
-		tx = userR.db.WithContext(ctx).Debug().Find(&users)
+		tx = ur.db.WithContext(ctx).Debug().Find(&users)
 		err = tx.Error
 	} else {
 		err = tx.WithContext(ctx).Debug().Find(&users).Error
@@ -117,12 +117,12 @@ func (userR *userRepository) GetAllUsers(ctx context.Context, tx *gorm.DB) ([]en
 	return users, nil
 }
 
-func (userR *userRepository) UpdateNameUser(ctx context.Context, tx *gorm.DB, name string, user entity.User) (entity.User, error) {
+func (ur *userRepository) UpdateNameUser(ctx context.Context, tx *gorm.DB, name string, user entity.User) (entity.User, error) {
 	var err error
 	userUpdate := user
 	userUpdate.Name = name
 	if tx == nil {
-		tx = userR.db.WithContext(ctx).Debug().Save(&userUpdate)
+		tx = ur.db.WithContext(ctx).Debug().Save(&userUpdate)
 		err = tx.Error
 	} else {
 		err = tx.WithContext(ctx).Debug().Save(&userUpdate).Error
@@ -134,14 +134,14 @@ func (userR *userRepository) UpdateNameUser(ctx context.Context, tx *gorm.DB, na
 	return userUpdate, nil
 }
 
-func (userR *userRepository) UpdateUser(ctx context.Context, tx *gorm.DB, user entity.User) (entity.User, error) {
+func (ur *userRepository) UpdateUser(ctx context.Context, tx *gorm.DB, user entity.User) (entity.User, error) {
 	if tx == nil {
-		tx = userR.db.WithContext(ctx).Debug().Updates(&user)
+		tx = ur.db.WithContext(ctx).Debug().Updates(&user)
 		if err := tx.Error; err != nil {
 			return entity.User{}, err
 		}
 	} else {
-		if err := userR.db.Updates(&user).Error; err != nil {
+		if err := ur.db.Updates(&user).Error; err != nil {
 			return entity.User{}, err
 		}
 	}
@@ -149,10 +149,10 @@ func (userR *userRepository) UpdateUser(ctx context.Context, tx *gorm.DB, user e
 	return user, nil
 }
 
-func (userR *userRepository) DeleteUserByID(ctx context.Context, tx *gorm.DB, id string) error {
+func (ur *userRepository) DeleteUserByID(ctx context.Context, tx *gorm.DB, id string) error {
 	var err error
 	if tx == nil {
-		tx = userR.db.WithContext(ctx).Debug().Delete(&entity.User{}, &id)
+		tx = ur.db.WithContext(ctx).Debug().Delete(&entity.User{}, &id)
 		err = tx.Error
 	} else {
 		err = tx.WithContext(ctx).Debug().Delete(&entity.User{}, &id).Error
