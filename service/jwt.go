@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/zetsux/gin-gorm-template-clean/common"
 )
 
 type JWTService interface {
@@ -30,7 +31,7 @@ type jwtService struct {
 func NewJWTService() JWTService {
 	return &jwtService{
 		secretKey: getSecretKey(),
-		issuer:    "admin",
+		issuer:    common.ENUM_ROLE_ADMIN,
 	}
 }
 

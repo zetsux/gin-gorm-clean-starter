@@ -4,6 +4,7 @@ import (
 	"context"
 	"reflect"
 
+	"github.com/zetsux/gin-gorm-template-clean/common"
 	"github.com/zetsux/gin-gorm-template-clean/dto"
 	"github.com/zetsux/gin-gorm-template-clean/entity"
 	"github.com/zetsux/gin-gorm-template-clean/repository"
@@ -58,7 +59,7 @@ func (us *userService) CreateNewUser(ctx context.Context, ud dto.UserRegisterReq
 	}
 
 	// Fill user role
-	ud.Role = "user"
+	ud.Role = common.ENUM_ROLE_USER
 
 	// Copy UserDTO to empty newly created user var
 	var user entity.User
