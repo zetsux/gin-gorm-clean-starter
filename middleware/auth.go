@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"net/http"
+	"slices"
 	"strings"
 
 	"github.com/zetsux/gin-gorm-template-clean/common"
@@ -10,7 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Authenticate(jwtService service.JWTService, role string) gin.HandlerFunc {
+func Authenticate(jwtService service.JWTService, roles ...string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
@@ -39,7 +40,7 @@ func Authenticate(jwtService service.JWTService, role string) gin.HandlerFunc {
 
 		// get role from token
 		roleRes, err := jwtService.GetRoleByToken(string(authHeader))
-		if err != nil || (roleRes != "admin" && roleRes != role) {
+		if err != nil || (roleRes != "admin" && !slices.Contains(roles, roleRes)) {
 			response := common.CreateFailResponse("Action unauthorized", "", http.StatusUnauthorized)
 			c.AbortWithStatusJSON(http.StatusForbidden, response)
 			return
