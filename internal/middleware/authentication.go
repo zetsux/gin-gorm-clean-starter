@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/zetsux/gin-gorm-template-clean/common"
-	"github.com/zetsux/gin-gorm-template-clean/service"
+	"github.com/zetsux/gin-gorm-template-clean/internal/service"
 
 	"github.com/gin-gonic/gin"
 )

@@ -4,8 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/zetsux/gin-gorm-template-clean/entity"
-	"github.com/zetsux/gin-gorm-template-clean/seeder"
+	"github.com/zetsux/gin-gorm-template-clean/migration"
 
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
@@ -34,9 +33,7 @@ func DBSetup() *gorm.DB {
 		panic(err)
 	}
 
-	DBMigrate(db)
-	DBSeed(db)
-
+	migration.DBMigrate(db)
 	return db
 }
 
@@ -47,21 +44,4 @@ func DBClose(db *gorm.DB) {
 		panic(err)
 	}
 	dbSQL.Close()
-}
-
-func DBMigrate(db *gorm.DB) {
-	err := db.AutoMigrate(
-		entity.User{},
-	)
-
-	if err != nil {
-		fmt.Println(err)
-		panic(err)
-	}
-}
-
-func DBSeed(db *gorm.DB) {
-	if err := seeder.Seed(db); err != nil {
-		panic(err)
-	}
 }

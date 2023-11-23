@@ -1,10 +1,10 @@
-package routes
+package route
 
 import (
+	"github.com/zetsux/gin-gorm-template-clean/api/v1/controller"
 	"github.com/zetsux/gin-gorm-template-clean/common"
-	"github.com/zetsux/gin-gorm-template-clean/controller"
-	"github.com/zetsux/gin-gorm-template-clean/middleware"
-	"github.com/zetsux/gin-gorm-template-clean/service"
+	"github.com/zetsux/gin-gorm-template-clean/internal/middleware"
+	"github.com/zetsux/gin-gorm-template-clean/internal/service"
 
 	"github.com/gin-gonic/gin"
 )

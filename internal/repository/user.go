@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/zetsux/gin-gorm-template-clean/entity"
+	"github.com/zetsux/gin-gorm-template-clean/internal/entity"
 
 	"gorm.io/gorm"
 )

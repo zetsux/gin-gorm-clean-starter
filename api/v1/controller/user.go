@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/zetsux/gin-gorm-template-clean/common"
-	"github.com/zetsux/gin-gorm-template-clean/dto"
-	"github.com/zetsux/gin-gorm-template-clean/service"
+	"github.com/zetsux/gin-gorm-template-clean/internal/dto"
+	"github.com/zetsux/gin-gorm-template-clean/internal/service"
 
 	"github.com/gin-gonic/gin"
 )

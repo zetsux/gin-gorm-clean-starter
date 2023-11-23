@@ -5,9 +5,9 @@ import (
 	"reflect"
 
 	"github.com/zetsux/gin-gorm-template-clean/common"
-	"github.com/zetsux/gin-gorm-template-clean/dto"
-	"github.com/zetsux/gin-gorm-template-clean/entity"
-	"github.com/zetsux/gin-gorm-template-clean/repository"
+	"github.com/zetsux/gin-gorm-template-clean/internal/dto"
+	"github.com/zetsux/gin-gorm-template-clean/internal/entity"
+	"github.com/zetsux/gin-gorm-template-clean/internal/repository"
 	"github.com/zetsux/gin-gorm-template-clean/utils"
 
 	"github.com/jinzhu/copier"
