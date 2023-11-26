@@ -9,10 +9,11 @@ import (
 
 type User struct {
 	common.Model
-	Name     string `json:"name" binding:"required"`
-	Email    string `json:"email" binding:"required"`
-	Password string `json:"password" binding:"required"`
-	Role     string `json:"role" binding:"required"`
+	Name     string `json:"name" gorm:"not null"`
+	Email    string `json:"email" gorm:"unique;not null"`
+	Password string `json:"password" gorm:"not null"`
+	Role     string `json:"role" gorm:"not null"`
+	Picture  string `json:"picture"`
 }
 
 func (u *User) BeforeCreate(tx *gorm.DB) error {

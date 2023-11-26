@@ -1,10 +1,14 @@
 package dto
 
-import "errors"
+import (
+	"errors"
+	"mime/multipart"
+)
 
 var (
 	ErrEmailAlreadyExists = errors.New("email already exists")
 	ErrUserNotFound       = errors.New("user not found")
+	ErrUserNoPicture      = errors.New("user don't have any picture")
 )
 
 const (
@@ -25,6 +29,12 @@ const (
 
 	MESSAGE_USER_DELETE_SUCCESS = "User delete successful"
 	MESSAGE_USER_DELETE_FAILED  = "Failed to process user delete request"
+
+	MESSAGE_USER_PICTURE_UPDATE_SUCCESS = "User picture update successful"
+	MESSAGE_USER_PICTURE_UPDATE_FAILED  = "Failed to process user picture update request"
+
+	MESSAGE_USER_PICTURE_DELETE_SUCCESS = "User picture delete successful"
+	MESSAGE_USER_PICTURE_DELETE_FAILED  = "Failed to process user picture delete request"
 )
 
 type (
@@ -36,10 +46,11 @@ type (
 	}
 
 	UserResponse struct {
-		ID    string `json:"id"`
-		Name  string `json:"name"`
-		Email string `json:"email"`
-		Role  string `json:"role"`
+		ID      string `json:"id"`
+		Name    string `json:"name,omitempty"`
+		Email   string `json:"email,omitempty"`
+		Role    string `json:"role,omitempty"`
+		Picture string `json:"picture,omitempty"`
 	}
 
 	UserLoginRequest struct {
@@ -57,5 +68,9 @@ type (
 		Email    string `json:"email" form:"email"`
 		Role     string `json:"role" form:"role"`
 		Password string `json:"password" form:"password"`
+	}
+
+	UserChangePictureRequest struct {
+		Picture *multipart.FileHeader `json:"picture" form:"picture"`
 	}
 )

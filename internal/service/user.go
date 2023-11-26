@@ -2,8 +2,10 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"reflect"
 
+	"github.com/google/uuid"
 	"github.com/zetsux/gin-gorm-template-clean/common"
 	"github.com/zetsux/gin-gorm-template-clean/internal/dto"
 	"github.com/zetsux/gin-gorm-template-clean/internal/entity"
@@ -26,6 +28,8 @@ type UserService interface {
 	UpdateUserById(ctx context.Context, ud dto.UserUpdateRequest, id string) (dto.UserResponse, error)
 	GetUserByID(ctx context.Context, id string) (dto.UserResponse, error)
 	DeleteUserById(ctx context.Context, id string) error
+	ChangePicture(ctx context.Context, req dto.UserChangePictureRequest, userId string) (dto.UserResponse, error)
+	DeletePicture(ctx context.Context, userId string) error
 }
 
 func NewUserService(userR repository.UserRepository) UserService {
@@ -87,10 +91,11 @@ func (us *userService) GetAllUsers(ctx context.Context) (userResp []dto.UserResp
 
 	for _, user := range users {
 		userResp = append(userResp, dto.UserResponse{
-			ID:    user.ID.String(),
-			Name:  user.Name,
-			Email: user.Email,
-			Role:  user.Role,
+			ID:      user.ID.String(),
+			Name:    user.Name,
+			Email:   user.Email,
+			Role:    user.Role,
+			Picture: user.Picture,
 		})
 	}
 
@@ -104,10 +109,11 @@ func (us *userService) GetUserByEmail(ctx context.Context, email string) (dto.Us
 	}
 
 	return dto.UserResponse{
-		ID:    user.ID.String(),
-		Name:  user.Name,
-		Email: user.Email,
-		Role:  user.Role,
+		ID:      user.ID.String(),
+		Name:    user.Name,
+		Email:   user.Email,
+		Role:    user.Role,
+		Picture: user.Picture,
 	}, nil
 }
 
@@ -118,10 +124,11 @@ func (us *userService) GetUserByID(ctx context.Context, id string) (dto.UserResp
 	}
 
 	return dto.UserResponse{
-		ID:    user.ID.String(),
-		Name:  user.Name,
-		Email: user.Email,
-		Role:  user.Role,
+		ID:      user.ID.String(),
+		Name:    user.Name,
+		Email:   user.Email,
+		Role:    user.Role,
+		Picture: user.Picture,
 	}, nil
 }
 
@@ -137,10 +144,8 @@ func (us *userService) UpdateSelfName(ctx context.Context, ud dto.UserNameUpdate
 	}
 
 	return dto.UserResponse{
-		ID:    user.ID.String(),
-		Name:  user.Name,
-		Email: user.Email,
-		Role:  user.Role,
+		ID:   user.ID.String(),
+		Name: user.Name,
 	}, nil
 }
 
@@ -189,10 +194,11 @@ func (us *userService) UpdateUserById(ctx context.Context, ud dto.UserUpdateRequ
 	}
 
 	return dto.UserResponse{
-		ID:    edited.ID.String(),
-		Name:  edited.Name,
-		Email: edited.Email,
-		Role:  edited.Role,
+		ID:      edited.ID.String(),
+		Name:    edited.Name,
+		Email:   edited.Email,
+		Role:    edited.Role,
+		Picture: user.Picture,
 	}, nil
 }
 
@@ -210,5 +216,75 @@ func (us *userService) DeleteUserById(ctx context.Context, id string) error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func (us *userService) ChangePicture(ctx context.Context, req dto.UserChangePictureRequest, userId string) (dto.UserResponse, error) {
+	user, err := us.userRepository.GetUserByID(ctx, nil, userId)
+	if err != nil {
+		return dto.UserResponse{}, err
+	}
+
+	if reflect.DeepEqual(user, entity.User{}) {
+		return dto.UserResponse{}, dto.ErrUserNotFound
+	}
+
+	if user.Picture != "" {
+		if err := utils.DeleteFile(user.Picture); err != nil {
+			return dto.UserResponse{}, err
+		}
+	}
+
+	picID := uuid.New()
+	picPath := fmt.Sprintf("user_picture/%v", picID)
+
+	userEdit := entity.User{
+		Picture: picPath,
+	}
+	userEdit.ID = user.ID
+
+	if err := utils.UploadFile(req.Picture, picPath); err != nil {
+		return dto.UserResponse{}, err
+	}
+
+	userUpdate, err := us.userRepository.UpdateUser(ctx, nil, userEdit)
+	if err != nil {
+		return dto.UserResponse{}, err
+	}
+
+	return dto.UserResponse{
+		ID:      userUpdate.ID.String(),
+		Picture: userUpdate.Picture,
+	}, nil
+}
+
+func (us *userService) DeletePicture(ctx context.Context, userId string) error {
+	user, err := us.userRepository.GetUserByID(ctx, nil, userId)
+	if err != nil {
+		return err
+	}
+
+	if reflect.DeepEqual(user, entity.User{}) {
+		return dto.ErrUserNotFound
+	}
+
+	if user.Picture == "" {
+		return dto.ErrUserNoPicture
+	}
+
+	if err := utils.DeleteFile(user.Picture); err != nil {
+		return err
+	}
+
+	userEdit := entity.User{
+		Picture: "",
+	}
+	userEdit.ID = user.ID
+
+	_, err = us.userRepository.UpdateUser(ctx, nil, userEdit)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

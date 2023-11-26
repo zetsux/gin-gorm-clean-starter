@@ -22,6 +22,8 @@ func main() {
 		userR repository.UserRepository = repository.NewUserRepository(db)
 		userS service.UserService       = service.NewUserService(userR)
 		userC controller.UserController = controller.NewUserController(userS, jwtS)
+
+		fileC controller.FileController = controller.NewFileController()
 	)
 
 	defer config.DBClose(db)
@@ -34,6 +36,7 @@ func main() {
 
 	// Setting Up Routes
 	route.UserRoutes(server, userC, jwtS)
+	route.FileRoutes(server, fileC)
 
 	// Running in localhost:8080
 	port := os.Getenv("PORT")

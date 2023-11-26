@@ -24,6 +24,8 @@ type UserController interface {
 	UpdateUserById(ctx *gin.Context)
 	DeleteSelfUser(ctx *gin.Context)
 	DeleteUserById(ctx *gin.Context)
+	ChangePicture(ctx *gin.Context)
+	DeletePicture(ctx *gin.Context)
 }
 
 func NewUserController(userS service.UserService, jwtS service.JWTService) UserController {
@@ -214,6 +216,52 @@ func (uc *userController) DeleteUserById(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, common.CreateSuccessResponse(
 		dto.MESSAGE_USER_DELETE_SUCCESS,
+		http.StatusOK, nil,
+	))
+}
+
+func (uc *userController) ChangePicture(ctx *gin.Context) {
+	id := ctx.MustGet("ID").(string)
+
+	var userDTO dto.UserChangePictureRequest
+	err := ctx.ShouldBind(&userDTO)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, common.CreateFailResponse(
+			dto.MESSAGE_USER_PICTURE_UPDATE_FAILED,
+			err.Error(), http.StatusBadRequest,
+		))
+		return
+	}
+
+	res, err := uc.userService.ChangePicture(ctx, userDTO, id)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, common.CreateFailResponse(
+			dto.MESSAGE_USER_PICTURE_UPDATE_FAILED,
+			err.Error(), http.StatusBadRequest,
+		))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, common.CreateSuccessResponse(
+		dto.MESSAGE_USER_PICTURE_UPDATE_SUCCESS,
+		http.StatusOK, res,
+	))
+}
+
+func (uc *userController) DeletePicture(ctx *gin.Context) {
+	id := ctx.Param("user_id")
+
+	err := uc.userService.DeletePicture(ctx, id)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, common.CreateFailResponse(
+			dto.MESSAGE_USER_PICTURE_DELETE_FAILED,
+			err.Error(), http.StatusBadRequest,
+		))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, common.CreateSuccessResponse(
+		dto.MESSAGE_USER_PICTURE_DELETE_SUCCESS,
 		http.StatusOK, nil,
 	))
 }
