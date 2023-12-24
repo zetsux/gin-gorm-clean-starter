@@ -1,11 +1,12 @@
 package common
 
 type Response struct {
-	IsSuccess bool   `json:"success"`
-	Message   string `json:"message"`
-	Error     string `json:"error,omitempty"`
-	Status    uint   `json:"status"`
-	Data      any    `json:"data"`
+	IsSuccess bool                `json:"success"`
+	Message   string              `json:"message"`
+	Error     string              `json:"error,omitempty"`
+	Status    uint                `json:"status"`
+	Data      any                 `json:"data"`
+	Meta      *PaginationResponse `json:"meta,omitempty"`
 }
 
 type AuthResponse struct {
@@ -13,7 +14,11 @@ type AuthResponse struct {
 	Role  string `json:"role"`
 }
 
-type EmptyObj struct {
+type PaginationResponse struct {
+	Page     int64 `json:"page"`
+	Limit    int64 `json:"limit"`
+	LastPage int64 `json:"last_page"`
+	Total    int64 `json:"total"`
 }
 
 func CreateFailResponse(msg string, err string, statusCode uint) Response {
@@ -25,6 +30,12 @@ func CreateFailResponse(msg string, err string, statusCode uint) Response {
 func CreateSuccessResponse(msg string, statusCode uint, d any) Response {
 	return Response{
 		IsSuccess: true, Message: msg, Status: statusCode, Data: d,
+	}
+}
+
+func CreatePaginatedResponse(msg string, statusCode uint, d any, pageMeta PaginationResponse) Response {
+	return Response{
+		IsSuccess: true, Message: msg, Status: statusCode, Data: d, Meta: &pageMeta,
 	}
 }
 

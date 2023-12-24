@@ -2,6 +2,7 @@ package controller
 
 import (
 	"net/http"
+	"reflect"
 
 	"github.com/zetsux/gin-gorm-template-clean/common"
 	"github.com/zetsux/gin-gorm-template-clean/internal/dto"
@@ -99,7 +100,16 @@ func (uc *userController) Login(ctx *gin.Context) {
 }
 
 func (uc *userController) GetAllUsers(ctx *gin.Context) {
-	users, err := uc.userService.GetAllUsers(ctx)
+	var req common.GetsRequest
+	if err := ctx.ShouldBind(&req); err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, common.CreateFailResponse(
+			dto.MESSAGE_USERS_FETCH_FAILED,
+			err.Error(), http.StatusBadRequest,
+		))
+		return
+	}
+
+	users, pageMeta, err := uc.userService.GetAllUsers(ctx, req)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, common.CreateFailResponse(
 			dto.MESSAGE_USERS_FETCH_FAILED,
@@ -108,10 +118,17 @@ func (uc *userController) GetAllUsers(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, common.CreateSuccessResponse(
-		dto.MESSAGE_USERS_FETCH_SUCCESS,
-		http.StatusOK, users,
-	))
+	if reflect.DeepEqual(pageMeta, common.PaginationResponse{}) {
+		ctx.JSON(http.StatusOK, common.CreateSuccessResponse(
+			dto.MESSAGE_USERS_FETCH_SUCCESS,
+			http.StatusOK, users,
+		))
+	} else {
+		ctx.JSON(http.StatusOK, common.CreatePaginatedResponse(
+			dto.MESSAGE_USERS_FETCH_SUCCESS,
+			http.StatusOK, users, pageMeta,
+		))
+	}
 }
 
 func (uc *userController) GetMe(ctx *gin.Context) {

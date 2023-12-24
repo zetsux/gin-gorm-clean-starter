@@ -25,7 +25,7 @@ func (fc *fileController) GetFile(ctx *gin.Context) {
 	dir := ctx.Param("dir")
 	fileId := ctx.Param("file_id")
 
-	filePath := strings.Join([]string{common.ENUM_FILE_BASE_PATH, dir, fileId}, "/")
+	filePath := strings.Join([]string{common.FILE_BASE_PATH, dir, fileId}, "/")
 
 	_, err := os.Stat(filePath)
 	if os.IsNotExist(err) {

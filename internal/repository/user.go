@@ -3,7 +3,9 @@ package repository
 import (
 	"context"
 	"errors"
+	"math"
 
+	"github.com/zetsux/gin-gorm-template-clean/common"
 	"github.com/zetsux/gin-gorm-template-clean/internal/entity"
 
 	"gorm.io/gorm"
@@ -23,7 +25,7 @@ type UserRepository interface {
 	CreateNewUser(ctx context.Context, tx *gorm.DB, user entity.User) (entity.User, error)
 	GetUserByEmail(ctx context.Context, tx *gorm.DB, email string) (entity.User, error)
 	GetUserByID(ctx context.Context, tx *gorm.DB, id string) (entity.User, error)
-	GetAllUsers(ctx context.Context, tx *gorm.DB) ([]entity.User, error)
+	GetAllUsers(ctx context.Context, req common.GetsRequest, tx *gorm.DB) ([]entity.User, int64, int64, error)
 	UpdateNameUser(ctx context.Context, tx *gorm.DB, name string, user entity.User) (entity.User, error)
 	UpdateUser(ctx context.Context, tx *gorm.DB, user entity.User) (entity.User, error)
 	DeleteUserByID(ctx context.Context, tx *gorm.DB, id string) error
@@ -100,21 +102,48 @@ func (ur *userRepository) GetUserByID(ctx context.Context, tx *gorm.DB, id strin
 	return user, nil
 }
 
-func (ur *userRepository) GetAllUsers(ctx context.Context, tx *gorm.DB) ([]entity.User, error) {
+func (ur *userRepository) GetAllUsers(ctx context.Context, req common.GetsRequest, tx *gorm.DB) ([]entity.User, int64, int64, error) {
 	var err error
 	var users []entity.User
+	var total int64
 
 	if tx == nil {
-		tx = ur.db.WithContext(ctx).Debug().Find(&users)
-		err = tx.Error
+		tx = ur.db
+	}
+
+	stmt := tx.WithContext(ctx).Debug()
+	if req.Search != "" {
+		searchQuery := "%" + req.Search + "%"
+		err = tx.WithContext(ctx).Model(&entity.User{}).Where("name ILIKE ? OR email ILIKE ?", searchQuery, searchQuery).Count(&total).Error
+		if err != nil {
+			return nil, 0, 0, err
+		}
+		stmt = stmt.Where("name ILIKE ? OR email ILIKE ?", searchQuery, searchQuery)
 	} else {
-		err = tx.WithContext(ctx).Debug().Find(&users).Error
+		err = tx.WithContext(ctx).Model(&entity.User{}).Count(&total).Error
+		if err != nil {
+			return nil, 0, 0, err
+		}
+	}
+
+	if req.Sort != "" {
+		stmt = stmt.Order(req.Sort)
+	}
+
+	lastPage := int64(math.Ceil(float64(total) / float64(req.Limit)))
+	if req.Limit == 0 {
+		err = stmt.Find(&users).Error
+	} else {
+		if req.Page <= 0 || int64(req.Page) > lastPage {
+			return nil, 0, 0, common.ErrInvalidPage
+		}
+		err = stmt.Offset(((req.Page - 1) * req.Limit)).Limit(req.Limit).Find(&users).Error
 	}
 
 	if err != nil && !(errors.Is(err, gorm.ErrRecordNotFound)) {
-		return users, err
+		return users, 0, 0, err
 	}
-	return users, nil
+	return users, lastPage, total, nil
 }
 
 func (ur *userRepository) UpdateNameUser(ctx context.Context, tx *gorm.DB, name string, user entity.User) (entity.User, error) {

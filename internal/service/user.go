@@ -22,7 +22,7 @@ type userService struct {
 type UserService interface {
 	VerifyLogin(ctx context.Context, email string, password string) bool
 	CreateNewUser(ctx context.Context, ud dto.UserRegisterRequest) (dto.UserResponse, error)
-	GetAllUsers(ctx context.Context) ([]dto.UserResponse, error)
+	GetAllUsers(ctx context.Context, req common.GetsRequest) ([]dto.UserResponse, common.PaginationResponse, error)
 	GetUserByEmail(ctx context.Context, email string) (dto.UserResponse, error)
 	UpdateSelfName(ctx context.Context, ud dto.UserNameUpdateRequest, id string) (dto.UserResponse, error)
 	UpdateUserById(ctx context.Context, ud dto.UserUpdateRequest, id string) (dto.UserResponse, error)
@@ -83,10 +83,22 @@ func (us *userService) CreateNewUser(ctx context.Context, ud dto.UserRegisterReq
 	}, nil
 }
 
-func (us *userService) GetAllUsers(ctx context.Context) (userResp []dto.UserResponse, err error) {
-	users, err := us.userRepository.GetAllUsers(ctx, nil)
+func (us *userService) GetAllUsers(ctx context.Context, req common.GetsRequest) (userResp []dto.UserResponse, pageResp common.PaginationResponse, err error) {
+	if req.Limit < 0 {
+		req.Limit = 0
+	}
+
+	if req.Page < 0 {
+		req.Page = 0
+	}
+
+	if req.Sort != "" && req.Sort[0] == '-' {
+		req.Sort = req.Sort[1:] + " DESC"
+	}
+
+	users, lastPage, total, err := us.userRepository.GetAllUsers(ctx, req, nil)
 	if err != nil {
-		return []dto.UserResponse{}, err
+		return []dto.UserResponse{}, common.PaginationResponse{}, err
 	}
 
 	for _, user := range users {
@@ -99,7 +111,17 @@ func (us *userService) GetAllUsers(ctx context.Context) (userResp []dto.UserResp
 		})
 	}
 
-	return userResp, nil
+	if req.Limit == 0 {
+		return userResp, common.PaginationResponse{}, nil
+	}
+
+	pageResp = common.PaginationResponse{
+		Page:     int64(req.Page),
+		Limit:    int64(req.Limit),
+		LastPage: lastPage,
+		Total:    total,
+	}
+	return userResp, pageResp, nil
 }
 
 func (us *userService) GetUserByEmail(ctx context.Context, email string) (dto.UserResponse, error) {
