@@ -9,6 +9,10 @@
   - [Explanation (ID)](#explanation-id)
 
 - [Pre-requisites](#pre-requisites)
+
+  - [PostgreSQL Requirements](#postgresql-requirements)
+  - [Husky Requirements](#husky-requirements)
+
 - [How to Run?](#how-to-run)
 - [API Documentation (Postman)](#api-documentation-postman)
 
@@ -129,8 +133,18 @@ A Clean Architecture starter template for projects using Gin (Golang) and Postgr
 
 ## Pre-requisites
 
+### PostgreSQL Requirements
+
 1. Create the database in PostgreSQL with the name equal to the value of DB_NAME in `.env`
 2. Use the command `CREATE EXTENSION IF NOT EXISTS "uuid-ossp";` on the database terminal
+
+### Husky Requirements
+
+> Note : Husky is not mandatory for this starter. Only do the steps below if you want to use it.
+
+1. Install husky to GO ENV by executing `go install github.com/automation-co/husky@latest`
+2. Install golangci-lint as the Linter by executing `go install github.com/golangci/golangci-lint@latest`. Alternatively, you can follow the recommended method, which involves installing the binary from the [official source](https://golangci-lint.run/usage/install/#binaries)
+3. Install husky on the local repository by executing `husky install`
 
 ## How to Run?
 
