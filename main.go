@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"os"
 
 	"github.com/zetsux/gin-gorm-template-clean/api/v1/controller"
@@ -43,5 +44,8 @@ func main() {
 	if port == "" {
 		port = "8080"
 	}
-	server.Run(":" + port)
+	err := server.Run(":" + port)
+	if err != nil {
+		log.Fatal("Server failed to start: ", err)
+	}
 }

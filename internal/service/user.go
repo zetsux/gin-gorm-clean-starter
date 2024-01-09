@@ -67,7 +67,10 @@ func (us *userService) CreateNewUser(ctx context.Context, ud dto.UserRegisterReq
 
 	// Copy UserDTO to empty newly created user var
 	var user entity.User
-	copier.Copy(&user, &ud)
+	err = copier.Copy(&user, &ud)
+	if err != nil {
+		return dto.UserResponse{}, err
+	}
 
 	// create new user
 	newUser, err := us.userRepository.CreateNewUser(ctx, nil, user)
