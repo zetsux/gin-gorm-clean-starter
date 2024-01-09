@@ -1,4 +1,4 @@
-package common
+package standard
 
 type GetsRequest struct {
 	Search string `json:"search" form:"search"`

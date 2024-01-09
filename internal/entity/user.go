@@ -1,14 +1,14 @@
 package entity
 
 import (
-	"github.com/zetsux/gin-gorm-template-clean/common"
-	"github.com/zetsux/gin-gorm-template-clean/utils"
+	"github.com/zetsux/gin-gorm-template-clean/common/standard"
+	"github.com/zetsux/gin-gorm-template-clean/common/utils"
 
 	"gorm.io/gorm"
 )
 
 type User struct {
-	common.Model
+	standard.Model
 	Name     string `json:"name" gorm:"not null"`
 	Email    string `json:"email" gorm:"unique;not null"`
 	Password string `json:"password" gorm:"not null"`

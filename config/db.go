@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/zetsux/gin-gorm-template-clean/migration"
+	migration "github.com/zetsux/gin-gorm-template-clean/database"
 
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"

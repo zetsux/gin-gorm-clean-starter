@@ -6,11 +6,11 @@ import (
 	"reflect"
 
 	"github.com/google/uuid"
-	"github.com/zetsux/gin-gorm-template-clean/common"
+	"github.com/zetsux/gin-gorm-template-clean/common/standard"
+	"github.com/zetsux/gin-gorm-template-clean/common/utils"
 	"github.com/zetsux/gin-gorm-template-clean/internal/dto"
 	"github.com/zetsux/gin-gorm-template-clean/internal/entity"
 	"github.com/zetsux/gin-gorm-template-clean/internal/repository"
-	"github.com/zetsux/gin-gorm-template-clean/utils"
 
 	"github.com/jinzhu/copier"
 )
@@ -22,7 +22,7 @@ type userService struct {
 type UserService interface {
 	VerifyLogin(ctx context.Context, email string, password string) bool
 	CreateNewUser(ctx context.Context, ud dto.UserRegisterRequest) (dto.UserResponse, error)
-	GetAllUsers(ctx context.Context, req common.GetsRequest) ([]dto.UserResponse, common.PaginationResponse, error)
+	GetAllUsers(ctx context.Context, req standard.GetsRequest) ([]dto.UserResponse, standard.PaginationResponse, error)
 	GetUserByEmail(ctx context.Context, email string) (dto.UserResponse, error)
 	UpdateSelfName(ctx context.Context, ud dto.UserNameUpdateRequest, id string) (dto.UserResponse, error)
 	UpdateUserById(ctx context.Context, ud dto.UserUpdateRequest, id string) (dto.UserResponse, error)
@@ -63,7 +63,7 @@ func (us *userService) CreateNewUser(ctx context.Context, ud dto.UserRegisterReq
 	}
 
 	// Fill user role
-	ud.Role = common.ENUM_ROLE_USER
+	ud.Role = standard.ENUM_ROLE_USER
 
 	// Copy UserDTO to empty newly created user var
 	var user entity.User
@@ -86,7 +86,7 @@ func (us *userService) CreateNewUser(ctx context.Context, ud dto.UserRegisterReq
 	}, nil
 }
 
-func (us *userService) GetAllUsers(ctx context.Context, req common.GetsRequest) (userResp []dto.UserResponse, pageResp common.PaginationResponse, err error) {
+func (us *userService) GetAllUsers(ctx context.Context, req standard.GetsRequest) (userResp []dto.UserResponse, pageResp standard.PaginationResponse, err error) {
 	if req.Limit < 0 {
 		req.Limit = 0
 	}
@@ -101,7 +101,7 @@ func (us *userService) GetAllUsers(ctx context.Context, req common.GetsRequest) 
 
 	users, lastPage, total, err := us.userRepository.GetAllUsers(ctx, req, nil)
 	if err != nil {
-		return []dto.UserResponse{}, common.PaginationResponse{}, err
+		return []dto.UserResponse{}, standard.PaginationResponse{}, err
 	}
 
 	for _, user := range users {
@@ -115,10 +115,10 @@ func (us *userService) GetAllUsers(ctx context.Context, req common.GetsRequest) 
 	}
 
 	if req.Limit == 0 {
-		return userResp, common.PaginationResponse{}, nil
+		return userResp, standard.PaginationResponse{}, nil
 	}
 
-	pageResp = common.PaginationResponse{
+	pageResp = standard.PaginationResponse{
 		Page:     int64(req.Page),
 		Limit:    int64(req.Limit),
 		LastPage: lastPage,

@@ -6,8 +6,8 @@ import (
 
 	"github.com/zetsux/gin-gorm-template-clean/api/v1/controller"
 	"github.com/zetsux/gin-gorm-template-clean/api/v1/route"
+	"github.com/zetsux/gin-gorm-template-clean/common/middleware"
 	"github.com/zetsux/gin-gorm-template-clean/config"
-	"github.com/zetsux/gin-gorm-template-clean/internal/middleware"
 	"github.com/zetsux/gin-gorm-template-clean/internal/repository"
 	"github.com/zetsux/gin-gorm-template-clean/internal/service"
 	"gorm.io/gorm"

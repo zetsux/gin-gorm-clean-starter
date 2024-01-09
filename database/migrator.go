@@ -1,10 +1,10 @@
-package migration
+package database
 
 import (
 	"fmt"
 
+	"github.com/zetsux/gin-gorm-template-clean/database/seeder"
 	"github.com/zetsux/gin-gorm-template-clean/internal/entity"
-	"github.com/zetsux/gin-gorm-template-clean/migration/seeder"
 	"gorm.io/gorm"
 )
 

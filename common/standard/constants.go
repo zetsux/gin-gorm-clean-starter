@@ -1,4 +1,4 @@
-package common
+package standard
 
 const (
 	ENUM_ROLE_ADMIN = "admin"
