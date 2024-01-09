@@ -14,13 +14,13 @@ func UserSeeder(db *gorm.DB) error {
 			Name:     "Admin",
 			Email:    "admin@gmail.com",
 			Password: "admin1",
-			Role:     standard.ENUM_ROLE_ADMIN,
+			Role:     standard.EnumRoleAdmin,
 		},
 		{
 			Name:     "User",
 			Email:    "user@gmail.com",
 			Password: "user1",
-			Role:     standard.ENUM_ROLE_USER,
+			Role:     standard.EnumRoleUser,
 		},
 	}
 

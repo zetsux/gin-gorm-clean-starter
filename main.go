@@ -1,7 +1,7 @@
 package main
 
 import (
-	"log"
+	"fmt"
 	"os"
 
 	"github.com/zetsux/gin-gorm-template-clean/api/v1/controller"
@@ -10,21 +10,20 @@ import (
 	"github.com/zetsux/gin-gorm-template-clean/config"
 	"github.com/zetsux/gin-gorm-template-clean/internal/repository"
 	"github.com/zetsux/gin-gorm-template-clean/internal/service"
-	"gorm.io/gorm"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	var (
-		db   *gorm.DB           = config.DBSetup()
-		jwtS service.JWTService = service.NewJWTService()
+		db   = config.DBSetup()
+		jwtS = service.NewJWTService()
 
-		userR repository.UserRepository = repository.NewUserRepository(db)
-		userS service.UserService       = service.NewUserService(userR)
-		userC controller.UserController = controller.NewUserController(userS, jwtS)
+		userR = repository.NewUserRepository(db)
+		userS = service.NewUserService(userR)
+		userC = controller.NewUserController(userS, jwtS)
 
-		fileC controller.FileController = controller.NewFileController()
+		fileC = controller.NewFileController()
 	)
 
 	defer config.DBClose(db)
@@ -46,6 +45,7 @@ func main() {
 	}
 	err := server.Run(":" + port)
 	if err != nil {
-		log.Fatal("Server failed to start: ", err)
+		fmt.Println("Server failed to start: ", err)
+		return
 	}
 }

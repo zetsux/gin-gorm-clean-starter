@@ -24,7 +24,7 @@ func Authenticate(jwtService service.JWTService, roles ...string) gin.HandlerFun
 			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
 			return
 		}
-		authHeader = strings.Replace(authHeader, "Bearer ", "", -1)
+		authHeader = strings.ReplaceAll(authHeader, "Bearer ", "")
 		token, err := jwtService.ValidateToken(authHeader)
 		if err != nil {
 			response := standard.CreateFailResponse("Invalid token", "", http.StatusUnauthorized)
@@ -39,18 +39,14 @@ func Authenticate(jwtService service.JWTService, roles ...string) gin.HandlerFun
 		}
 
 		// get role from token
-		roleRes, err := jwtService.GetRoleByToken(string(authHeader))
-		if err != nil || (roleRes != standard.ENUM_ROLE_ADMIN && !slices.Contains(roles, roleRes)) {
-			response := standard.CreateFailResponse("Action unauthorized", "", http.StatusUnauthorized)
-			c.AbortWithStatusJSON(http.StatusForbidden, response)
-			return
-		}
-
-		// get userID from token
-		idRes, err := jwtService.GetIDByToken(authHeader)
+		idRes, roleRes, err := jwtService.GetAttrByToken(authHeader)
 		if err != nil {
 			response := standard.CreateFailResponse("Failed to process request", "", http.StatusUnauthorized)
 			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
+			return
+		} else if roleRes != standard.EnumRoleAdmin && !slices.Contains(roles, roleRes) {
+			response := standard.CreateFailResponse("Action unauthorized", "", http.StatusUnauthorized)
+			c.AbortWithStatusJSON(http.StatusForbidden, response)
 			return
 		}
 		c.Set("ID", idRes)

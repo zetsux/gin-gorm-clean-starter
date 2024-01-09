@@ -13,17 +13,17 @@ func UserRoutes(router *gin.Engine, userC controller.UserController, jwtS servic
 	userRoutes := router.Group("/api/v1/users")
 	{
 		// admin routes
-		userRoutes.GET("", middleware.Authenticate(jwtS, standard.ENUM_ROLE_ADMIN), userC.GetAllUsers)
-		userRoutes.PATCH("/:user_id", middleware.Authenticate(jwtS, standard.ENUM_ROLE_ADMIN), userC.UpdateUserById)
-		userRoutes.DELETE("/:user_id", middleware.Authenticate(jwtS, standard.ENUM_ROLE_ADMIN), userC.DeleteUserById)
+		userRoutes.GET("", middleware.Authenticate(jwtS, standard.EnumRoleAdmin), userC.GetAllUsers)
+		userRoutes.PATCH("/:user_id", middleware.Authenticate(jwtS, standard.EnumRoleAdmin), userC.UpdateUserByID)
+		userRoutes.DELETE("/:user_id", middleware.Authenticate(jwtS, standard.EnumRoleAdmin), userC.DeleteUserByID)
 
 		// user routes
-		userRoutes.GET("/me", middleware.Authenticate(jwtS, standard.ENUM_ROLE_USER), userC.GetMe)
-		userRoutes.PATCH("/me/name", middleware.Authenticate(jwtS, standard.ENUM_ROLE_USER), userC.UpdateSelfName)
-		userRoutes.DELETE("/me", middleware.Authenticate(jwtS, standard.ENUM_ROLE_USER), userC.DeleteSelfUser)
+		userRoutes.GET("/me", middleware.Authenticate(jwtS, standard.EnumRoleUser), userC.GetMe)
+		userRoutes.PATCH("/me/name", middleware.Authenticate(jwtS, standard.EnumRoleUser), userC.UpdateSelfName)
+		userRoutes.DELETE("/me", middleware.Authenticate(jwtS, standard.EnumRoleUser), userC.DeleteSelfUser)
 		userRoutes.POST("", userC.Register)
 		userRoutes.POST("/login", userC.Login)
-		userRoutes.PATCH("/picture", middleware.Authenticate(jwtS, standard.ENUM_ROLE_USER), userC.ChangePicture)
-		userRoutes.DELETE("/picture/:user_id", middleware.Authenticate(jwtS, standard.ENUM_ROLE_USER), userC.DeletePicture)
+		userRoutes.PATCH("/picture", middleware.Authenticate(jwtS, standard.EnumRoleUser), userC.ChangePicture)
+		userRoutes.DELETE("/picture/:user_id", middleware.Authenticate(jwtS, standard.EnumRoleUser), userC.DeletePicture)
 	}
 }

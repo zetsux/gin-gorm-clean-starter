@@ -23,14 +23,14 @@ func NewFileController() FileController {
 
 func (fc *fileController) GetFile(ctx *gin.Context) {
 	dir := ctx.Param("dir")
-	fileId := ctx.Param("file_id")
+	fileID := ctx.Param("file_id")
 
-	filePath := strings.Join([]string{standard.FILE_BASE_PATH, dir, fileId}, "/")
+	filePath := strings.Join([]string{standard.FileBasePath, dir, fileID}, "/")
 
 	_, err := os.Stat(filePath)
 	if os.IsNotExist(err) {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, standard.CreateFailResponse(
-			dto.MESSAGE_FILE_FETCH_FAILED,
+			dto.MessageFileFetchFailed,
 			err.Error(), http.StatusBadRequest,
 		))
 		return

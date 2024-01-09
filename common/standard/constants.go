@@ -1,10 +1,13 @@
 package standard
 
 const (
-	ENUM_ROLE_ADMIN = "admin"
-	ENUM_ROLE_USER  = "user"
+	EnumRoleAdmin = "admin"
+	EnumRoleUser  = "user"
 
-	FILE_BASE_PATH = "files"
+	DBAttrID    = "id"
+	DBAttrEmail = "email"
 
-	DEFAULT_PAGINATION_LIMIT = 10
+	FileBasePath = "files"
+
+	DefaultPaginationLimit = 10
 )

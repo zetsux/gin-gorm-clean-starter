@@ -23,8 +23,7 @@ type UserRepository interface {
 
 	// functional
 	CreateNewUser(ctx context.Context, tx *gorm.DB, user entity.User) (entity.User, error)
-	GetUserByEmail(ctx context.Context, tx *gorm.DB, email string) (entity.User, error)
-	GetUserByID(ctx context.Context, tx *gorm.DB, id string) (entity.User, error)
+	GetUserByPrimaryKey(ctx context.Context, tx *gorm.DB, key string, val string) (entity.User, error)
 	GetAllUsers(ctx context.Context, req standard.GetsRequest, tx *gorm.DB) ([]entity.User, int64, int64, error)
 	UpdateNameUser(ctx context.Context, tx *gorm.DB, name string, user entity.User) (entity.User, error)
 	UpdateUser(ctx context.Context, tx *gorm.DB, user entity.User) (entity.User, error)
@@ -70,14 +69,15 @@ func (ur *userRepository) CreateNewUser(ctx context.Context, tx *gorm.DB, user e
 	return user, nil
 }
 
-func (ur *userRepository) GetUserByEmail(ctx context.Context, tx *gorm.DB, email string) (entity.User, error) {
+func (ur *userRepository) GetUserByPrimaryKey(ctx context.Context,
+	tx *gorm.DB, key string, val string) (entity.User, error) {
 	var err error
 	var user entity.User
 	if tx == nil {
-		tx = ur.db.WithContext(ctx).Debug().Where("email = $1", email).Take(&user)
+		tx = ur.db.WithContext(ctx).Debug().Where(key+" = $1", val).Take(&user)
 		err = tx.Error
 	} else {
-		err = tx.WithContext(ctx).Debug().Where("email = $1", email).Take(&user).Error
+		err = tx.WithContext(ctx).Debug().Where(key+" = $1", val).Take(&user).Error
 	}
 
 	if err != nil && !(errors.Is(err, gorm.ErrRecordNotFound)) {
@@ -86,23 +86,8 @@ func (ur *userRepository) GetUserByEmail(ctx context.Context, tx *gorm.DB, email
 	return user, nil
 }
 
-func (ur *userRepository) GetUserByID(ctx context.Context, tx *gorm.DB, id string) (entity.User, error) {
-	var err error
-	var user entity.User
-	if tx == nil {
-		tx = ur.db.WithContext(ctx).Debug().Where("id = $1", id).Take(&user)
-		err = tx.Error
-	} else {
-		err = tx.WithContext(ctx).Debug().Where("id = $1", id).Take(&user).Error
-	}
-
-	if err != nil && !(errors.Is(err, gorm.ErrRecordNotFound)) {
-		return user, err
-	}
-	return user, nil
-}
-
-func (ur *userRepository) GetAllUsers(ctx context.Context, req standard.GetsRequest, tx *gorm.DB) ([]entity.User, int64, int64, error) {
+func (ur *userRepository) GetAllUsers(ctx context.Context,
+	req standard.GetsRequest, tx *gorm.DB) ([]entity.User, int64, int64, error) {
 	var err error
 	var users []entity.User
 	var total int64
@@ -114,7 +99,10 @@ func (ur *userRepository) GetAllUsers(ctx context.Context, req standard.GetsRequ
 	stmt := tx.WithContext(ctx).Debug()
 	if req.Search != "" {
 		searchQuery := "%" + req.Search + "%"
-		err = tx.WithContext(ctx).Model(&entity.User{}).Where("name ILIKE ? OR email ILIKE ?", searchQuery, searchQuery).Count(&total).Error
+		err = tx.WithContext(ctx).Model(&entity.User{}).
+			Where("name ILIKE ? OR email ILIKE ?", searchQuery, searchQuery).
+			Count(&total).Error
+
 		if err != nil {
 			return nil, 0, 0, err
 		}
@@ -146,7 +134,8 @@ func (ur *userRepository) GetAllUsers(ctx context.Context, req standard.GetsRequ
 	return users, lastPage, total, nil
 }
 
-func (ur *userRepository) UpdateNameUser(ctx context.Context, tx *gorm.DB, name string, user entity.User) (entity.User, error) {
+func (ur *userRepository) UpdateNameUser(ctx context.Context,
+	tx *gorm.DB, name string, user entity.User) (entity.User, error) {
 	var err error
 	userUpdate := user
 	userUpdate.Name = name

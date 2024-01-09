@@ -13,8 +13,7 @@ import (
 type JWTService interface {
 	GenerateToken(id string, role string) string
 	ValidateToken(token string) (*jwt.Token, error)
-	GetIDByToken(token string) (string, error)
-	GetRoleByToken(token string) (string, error)
+	GetAttrByToken(token string) (string, string, error)
 }
 
 type jwtCustomClaim struct {
@@ -31,7 +30,7 @@ type jwtService struct {
 func NewJWTService() JWTService {
 	return &jwtService{
 		secretKey: getSecretKey(),
-		issuer:    standard.ENUM_ROLE_ADMIN,
+		issuer:    standard.EnumRoleAdmin,
 	}
 }
 
@@ -70,22 +69,13 @@ func (j *jwtService) ValidateToken(token string) (*jwt.Token, error) {
 	})
 }
 
-func (j *jwtService) GetIDByToken(token string) (string, error) {
-	t_Token, err := j.ValidateToken(token)
+func (j *jwtService) GetAttrByToken(token string) (string, string, error) {
+	tToken, err := j.ValidateToken(token)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
-	claims := t_Token.Claims.(jwt.MapClaims)
+	claims := tToken.Claims.(jwt.MapClaims)
 	id := fmt.Sprintf("%v", claims["id"])
-	return id, nil
-}
-
-func (j *jwtService) GetRoleByToken(token string) (string, error) {
-	t_Token, err := j.ValidateToken(token)
-	if err != nil {
-		return "", err
-	}
-	claims := t_Token.Claims.(jwt.MapClaims)
 	role := fmt.Sprintf("%v", claims["role"])
-	return role, nil
+	return id, role, nil
 }

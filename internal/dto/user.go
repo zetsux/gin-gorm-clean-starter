@@ -12,29 +12,29 @@ var (
 )
 
 const (
-	MESSAGE_USER_REGISTER_SUCCESS = "User register successful"
-	MESSAGE_USER_REGISTER_FAILED  = "Failed to process user register request"
+	MessageUserRegisterSuccess = "User register successful"
+	MessageUserRegisterFailed  = "Failed to process user register request"
 
-	MESSAGE_USER_LOGIN_SUCCESS    = "User login successful"
-	MESSAGE_USER_LOGIN_FAILED     = "Failed to process user login request"
-	MESSAGE_USER_WRONG_CREDENTIAL = "Entered credentials invalid"
+	MessageUserLoginSuccess    = "User login successful"
+	MessageUserLoginFailed     = "Failed to process user login request"
+	MessageUserWrongCredential = "Entered credentials invalid"
 
-	MESSAGE_USERS_FETCH_SUCCESS = "Users fetched successfully"
-	MESSAGE_USERS_FETCH_FAILED  = "Failed to fetch users"
-	MESSAGE_USER_FETCH_SUCCESS  = "User fetched successfully"
-	MESSAGE_USER_FETCH_FAILED   = "Failed to fetch user"
+	MessageUsersFetchSuccess = "Users fetched successfully"
+	MessageUsersFetchFailed  = "Failed to fetch users"
+	MessageUserFetchSuccess  = "User fetched successfully"
+	MessageUserFetchFailed   = "Failed to fetch user"
 
-	MESSAGE_USER_UPDATE_SUCCESS = "User update successful"
-	MESSAGE_USER_UPDATE_FAILED  = "Failed to process user update request"
+	MessageUserUpdateSuccess = "User update successful"
+	MessageUserUpdateFailed  = "Failed to process user update request"
 
-	MESSAGE_USER_DELETE_SUCCESS = "User delete successful"
-	MESSAGE_USER_DELETE_FAILED  = "Failed to process user delete request"
+	MessageUserDeleteSuccess = "User delete successful"
+	MessageUserDeleteFailed  = "Failed to process user delete request"
 
-	MESSAGE_USER_PICTURE_UPDATE_SUCCESS = "User picture update successful"
-	MESSAGE_USER_PICTURE_UPDATE_FAILED  = "Failed to process user picture update request"
+	MessageUserPictureUpdateSuccess = "User picture update successful"
+	MessageUserPictureUpdateFailed  = "Failed to process user picture update request"
 
-	MESSAGE_USER_PICTURE_DELETE_SUCCESS = "User picture delete successful"
-	MESSAGE_USER_PICTURE_DELETE_FAILED  = "Failed to process user picture delete request"
+	MessageUserPictureDeleteSuccess = "User picture delete successful"
+	MessageUserPictureDeleteFailed  = "Failed to process user picture delete request"
 )
 
 type (

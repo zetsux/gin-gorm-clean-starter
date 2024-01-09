@@ -8,6 +8,6 @@ var (
 )
 
 const (
-	MESSAGE_FILE_FETCH_SUCCESS = "File fetched successfully"
-	MESSAGE_FILE_FETCH_FAILED  = "Failed to fetch file"
+	MessageFileFetchSuccess = "File fetched successfully"
+	MessageFileFetchFailed  = "Failed to fetch file"
 )
