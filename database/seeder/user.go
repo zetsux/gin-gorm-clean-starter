@@ -3,8 +3,8 @@ package seeder
 import (
 	"errors"
 
-	"github.com/zetsux/gin-gorm-template-clean/common/standard"
-	"github.com/zetsux/gin-gorm-template-clean/internal/entity"
+	"github.com/zetsux/gin-gorm-template-clean/common/constant"
+	"github.com/zetsux/gin-gorm-template-clean/core/entity"
 	"gorm.io/gorm"
 )
 
@@ -14,13 +14,13 @@ func UserSeeder(db *gorm.DB) error {
 			Name:     "Admin",
 			Email:    "admin@gmail.com",
 			Password: "admin1",
-			Role:     standard.EnumRoleAdmin,
+			Role:     constant.EnumRoleAdmin,
 		},
 		{
 			Name:     "User",
 			Email:    "user@gmail.com",
 			Password: "user1",
-			Role:     standard.EnumRoleUser,
+			Role:     constant.EnumRoleUser,
 		},
 	}
 

@@ -5,8 +5,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/zetsux/gin-gorm-template-clean/common/standard"
-	"github.com/zetsux/gin-gorm-template-clean/internal/dto"
+	"github.com/zetsux/gin-gorm-template-clean/common/base"
+	"github.com/zetsux/gin-gorm-template-clean/common/constant"
+	"github.com/zetsux/gin-gorm-template-clean/core/helper/messages"
 
 	"github.com/gin-gonic/gin"
 )
@@ -25,12 +26,12 @@ func (fc *fileController) GetFile(ctx *gin.Context) {
 	dir := ctx.Param("dir")
 	fileID := ctx.Param("file_id")
 
-	filePath := strings.Join([]string{standard.FileBasePath, dir, fileID}, "/")
+	filePath := strings.Join([]string{constant.FileBasePath, dir, fileID}, "/")
 
 	_, err := os.Stat(filePath)
 	if os.IsNotExist(err) {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, standard.CreateFailResponse(
-			dto.MessageFileFetchFailed,
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, base.CreateFailResponse(
+			messages.MessageFileFetchFailed,
 			err.Error(), http.StatusBadRequest,
 		))
 		return

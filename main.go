@@ -5,11 +5,11 @@ import (
 	"os"
 
 	"github.com/zetsux/gin-gorm-template-clean/api/v1/controller"
-	"github.com/zetsux/gin-gorm-template-clean/api/v1/route"
+	"github.com/zetsux/gin-gorm-template-clean/api/v1/router"
 	"github.com/zetsux/gin-gorm-template-clean/common/middleware"
 	"github.com/zetsux/gin-gorm-template-clean/config"
-	"github.com/zetsux/gin-gorm-template-clean/internal/repository"
-	"github.com/zetsux/gin-gorm-template-clean/internal/service"
+	"github.com/zetsux/gin-gorm-template-clean/core/repository"
+	"github.com/zetsux/gin-gorm-template-clean/core/service"
 
 	"github.com/gin-gonic/gin"
 )
@@ -35,8 +35,8 @@ func main() {
 	)
 
 	// Setting Up Routes
-	route.UserRoutes(server, userC, jwtS)
-	route.FileRoutes(server, fileC)
+	router.UserRouter(server, userC, jwtS)
+	router.FileRouter(server, fileC)
 
 	// Running in localhost:8080
 	port := os.Getenv("PORT")

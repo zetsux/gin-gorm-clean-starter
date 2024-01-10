@@ -6,11 +6,13 @@ import (
 	"reflect"
 
 	"github.com/google/uuid"
-	"github.com/zetsux/gin-gorm-template-clean/common/standard"
-	"github.com/zetsux/gin-gorm-template-clean/common/utils"
-	"github.com/zetsux/gin-gorm-template-clean/internal/dto"
-	"github.com/zetsux/gin-gorm-template-clean/internal/entity"
-	"github.com/zetsux/gin-gorm-template-clean/internal/repository"
+	"github.com/zetsux/gin-gorm-template-clean/common/base"
+	"github.com/zetsux/gin-gorm-template-clean/common/constant"
+	"github.com/zetsux/gin-gorm-template-clean/common/util"
+	"github.com/zetsux/gin-gorm-template-clean/core/entity"
+	"github.com/zetsux/gin-gorm-template-clean/core/helper/dto"
+	"github.com/zetsux/gin-gorm-template-clean/core/helper/errs"
+	"github.com/zetsux/gin-gorm-template-clean/core/repository"
 
 	"github.com/jinzhu/copier"
 )
@@ -22,7 +24,7 @@ type userService struct {
 type UserService interface {
 	VerifyLogin(ctx context.Context, email string, password string) bool
 	CreateNewUser(ctx context.Context, ud dto.UserRegisterRequest) (dto.UserResponse, error)
-	GetAllUsers(ctx context.Context, req standard.GetsRequest) ([]dto.UserResponse, standard.PaginationResponse, error)
+	GetAllUsers(ctx context.Context, req base.GetsRequest) ([]dto.UserResponse, base.PaginationResponse, error)
 	GetUserByPrimaryKey(ctx context.Context, key string, value string) (dto.UserResponse, error)
 	UpdateSelfName(ctx context.Context, ud dto.UserNameUpdateRequest, id string) (dto.UserResponse, error)
 	UpdateUserByID(ctx context.Context, ud dto.UserUpdateRequest, id string) (dto.UserResponse, error)
@@ -36,11 +38,11 @@ func NewUserService(userR repository.UserRepository) UserService {
 }
 
 func (us *userService) VerifyLogin(ctx context.Context, email string, password string) bool {
-	userCheck, err := us.userRepository.GetUserByPrimaryKey(ctx, nil, standard.DBAttrEmail, email)
+	userCheck, err := us.userRepository.GetUserByPrimaryKey(ctx, nil, constant.DBAttrEmail, email)
 	if err != nil {
 		return false
 	}
-	passwordCheck, err := utils.PasswordCompare(userCheck.Password, []byte(password))
+	passwordCheck, err := util.PasswordCompare(userCheck.Password, []byte(password))
 	if err != nil {
 		return false
 	}
@@ -52,17 +54,17 @@ func (us *userService) VerifyLogin(ctx context.Context, email string, password s
 }
 
 func (us *userService) CreateNewUser(ctx context.Context, ud dto.UserRegisterRequest) (dto.UserResponse, error) {
-	userCheck, err := us.userRepository.GetUserByPrimaryKey(ctx, nil, standard.DBAttrEmail, ud.Email)
+	userCheck, err := us.userRepository.GetUserByPrimaryKey(ctx, nil, constant.DBAttrEmail, ud.Email)
 	if err != nil {
 		return dto.UserResponse{}, err
 	}
 
 	if !(reflect.DeepEqual(userCheck, entity.User{})) {
-		return dto.UserResponse{}, dto.ErrEmailAlreadyExists
+		return dto.UserResponse{}, errs.ErrEmailAlreadyExists
 	}
 
 	// Fill user role
-	ud.Role = standard.EnumRoleUser
+	ud.Role = constant.EnumRoleUser
 
 	// Copy UserDTO to empty newly created user var
 	var user entity.User
@@ -85,8 +87,8 @@ func (us *userService) CreateNewUser(ctx context.Context, ud dto.UserRegisterReq
 	}, nil
 }
 
-func (us *userService) GetAllUsers(ctx context.Context, req standard.GetsRequest) (
-	userResp []dto.UserResponse, pageResp standard.PaginationResponse, err error) {
+func (us *userService) GetAllUsers(ctx context.Context, req base.GetsRequest) (
+	userResp []dto.UserResponse, pageResp base.PaginationResponse, err error) {
 	if req.Limit < 0 {
 		req.Limit = 0
 	}
@@ -101,7 +103,7 @@ func (us *userService) GetAllUsers(ctx context.Context, req standard.GetsRequest
 
 	users, lastPage, total, err := us.userRepository.GetAllUsers(ctx, req, nil)
 	if err != nil {
-		return []dto.UserResponse{}, standard.PaginationResponse{}, err
+		return []dto.UserResponse{}, base.PaginationResponse{}, err
 	}
 
 	for _, user := range users {
@@ -115,10 +117,10 @@ func (us *userService) GetAllUsers(ctx context.Context, req standard.GetsRequest
 	}
 
 	if req.Limit == 0 {
-		return userResp, standard.PaginationResponse{}, nil
+		return userResp, base.PaginationResponse{}, nil
 	}
 
-	pageResp = standard.PaginationResponse{
+	pageResp = base.PaginationResponse{
 		Page:     int64(req.Page),
 		Limit:    int64(req.Limit),
 		LastPage: lastPage,
@@ -144,7 +146,7 @@ func (us *userService) GetUserByPrimaryKey(ctx context.Context, key string, val 
 
 func (us *userService) UpdateSelfName(ctx context.Context,
 	ud dto.UserNameUpdateRequest, id string) (dto.UserResponse, error) {
-	user, err := us.userRepository.GetUserByPrimaryKey(ctx, nil, standard.DBAttrID, id)
+	user, err := us.userRepository.GetUserByPrimaryKey(ctx, nil, constant.DBAttrID, id)
 	if err != nil {
 		return dto.UserResponse{}, err
 	}
@@ -162,23 +164,23 @@ func (us *userService) UpdateSelfName(ctx context.Context,
 
 func (us *userService) UpdateUserByID(ctx context.Context,
 	ud dto.UserUpdateRequest, id string) (dto.UserResponse, error) {
-	user, err := us.userRepository.GetUserByPrimaryKey(ctx, nil, standard.DBAttrID, id)
+	user, err := us.userRepository.GetUserByPrimaryKey(ctx, nil, constant.DBAttrID, id)
 	if err != nil {
 		return dto.UserResponse{}, err
 	}
 
 	if reflect.DeepEqual(user, entity.User{}) {
-		return dto.UserResponse{}, dto.ErrUserNotFound
+		return dto.UserResponse{}, errs.ErrUserNotFound
 	}
 
 	if ud.Email != "" && ud.Email != user.Email {
-		us, err := us.userRepository.GetUserByPrimaryKey(ctx, nil, standard.DBAttrEmail, ud.Email)
+		us, err := us.userRepository.GetUserByPrimaryKey(ctx, nil, constant.DBAttrEmail, ud.Email)
 		if err != nil {
 			return dto.UserResponse{}, err
 		}
 
 		if !(reflect.DeepEqual(us, entity.User{})) {
-			return dto.UserResponse{}, dto.ErrEmailAlreadyExists
+			return dto.UserResponse{}, errs.ErrEmailAlreadyExists
 		}
 	}
 
@@ -215,13 +217,13 @@ func (us *userService) UpdateUserByID(ctx context.Context,
 }
 
 func (us *userService) DeleteUserByID(ctx context.Context, id string) error {
-	userCheck, err := us.userRepository.GetUserByPrimaryKey(ctx, nil, standard.DBAttrID, id)
+	userCheck, err := us.userRepository.GetUserByPrimaryKey(ctx, nil, constant.DBAttrID, id)
 	if err != nil {
 		return err
 	}
 
 	if reflect.DeepEqual(userCheck, entity.User{}) {
-		return dto.ErrUserNotFound
+		return errs.ErrUserNotFound
 	}
 
 	err = us.userRepository.DeleteUserByID(ctx, nil, id)
@@ -233,17 +235,17 @@ func (us *userService) DeleteUserByID(ctx context.Context, id string) error {
 
 func (us *userService) ChangePicture(ctx context.Context,
 	req dto.UserChangePictureRequest, userID string) (dto.UserResponse, error) {
-	user, err := us.userRepository.GetUserByPrimaryKey(ctx, nil, standard.DBAttrID, userID)
+	user, err := us.userRepository.GetUserByPrimaryKey(ctx, nil, constant.DBAttrID, userID)
 	if err != nil {
 		return dto.UserResponse{}, err
 	}
 
 	if reflect.DeepEqual(user, entity.User{}) {
-		return dto.UserResponse{}, dto.ErrUserNotFound
+		return dto.UserResponse{}, errs.ErrUserNotFound
 	}
 
 	if user.Picture != "" {
-		if err := utils.DeleteFile(user.Picture); err != nil {
+		if err := util.DeleteFile(user.Picture); err != nil {
 			return dto.UserResponse{}, err
 		}
 	}
@@ -256,7 +258,7 @@ func (us *userService) ChangePicture(ctx context.Context,
 	}
 	userEdit.ID = user.ID
 
-	if err := utils.UploadFile(req.Picture, picPath); err != nil {
+	if err := util.UploadFile(req.Picture, picPath); err != nil {
 		return dto.UserResponse{}, err
 	}
 
@@ -272,20 +274,20 @@ func (us *userService) ChangePicture(ctx context.Context,
 }
 
 func (us *userService) DeletePicture(ctx context.Context, userID string) error {
-	user, err := us.userRepository.GetUserByPrimaryKey(ctx, nil, standard.DBAttrID, userID)
+	user, err := us.userRepository.GetUserByPrimaryKey(ctx, nil, constant.DBAttrID, userID)
 	if err != nil {
 		return err
 	}
 
 	if reflect.DeepEqual(user, entity.User{}) {
-		return dto.ErrUserNotFound
+		return errs.ErrUserNotFound
 	}
 
 	if user.Picture == "" {
-		return dto.ErrUserNoPicture
+		return errs.ErrUserNoPicture
 	}
 
-	if err := utils.DeleteFile(user.Picture); err != nil {
+	if err := util.DeleteFile(user.Picture); err != nil {
 		return err
 	}
 

@@ -1,4 +1,4 @@
-package standard
+package base
 
 type Response struct {
 	IsSuccess bool                `json:"success"`

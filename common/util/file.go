@@ -1,4 +1,4 @@
-package utils
+package util
 
 import (
 	"fmt"
@@ -7,13 +7,13 @@ import (
 	"os"
 	"strings"
 
-	"github.com/zetsux/gin-gorm-template-clean/common/standard"
-	"github.com/zetsux/gin-gorm-template-clean/internal/dto"
+	"github.com/zetsux/gin-gorm-template-clean/common/constant"
+	"github.com/zetsux/gin-gorm-template-clean/core/helper/errs"
 )
 
 func UploadFile(file *multipart.FileHeader, path string) error {
 	subPath := strings.Split(path, "/")
-	dirPath := fmt.Sprintf("%s/%s", standard.FileBasePath, subPath[0])
+	dirPath := fmt.Sprintf("%s/%s", constant.FileBasePath, subPath[0])
 
 	if _, err := os.Stat(dirPath); os.IsNotExist(err) {
 		if err := os.MkdirAll(dirPath, 0777); err != nil {
@@ -41,14 +41,14 @@ func UploadFile(file *multipart.FileHeader, path string) error {
 }
 
 func DeleteFile(path string) error {
-	filePath := fmt.Sprintf("%s/%s", standard.FileBasePath, path)
+	filePath := fmt.Sprintf("%s/%s", constant.FileBasePath, path)
 
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
-		return dto.ErrFileNotFound
+		return errs.ErrFileNotFound
 	}
 
 	if err := os.Remove(filePath); err != nil {
-		return dto.ErrFileDeleteFailed
+		return errs.ErrFileDeleteFailed
 	}
 
 	return nil

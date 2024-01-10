@@ -4,9 +4,11 @@ import (
 	"net/http"
 	"reflect"
 
-	"github.com/zetsux/gin-gorm-template-clean/common/standard"
-	"github.com/zetsux/gin-gorm-template-clean/internal/dto"
-	"github.com/zetsux/gin-gorm-template-clean/internal/service"
+	"github.com/zetsux/gin-gorm-template-clean/common/base"
+	"github.com/zetsux/gin-gorm-template-clean/common/constant"
+	"github.com/zetsux/gin-gorm-template-clean/core/helper/dto"
+	"github.com/zetsux/gin-gorm-template-clean/core/helper/messages"
+	"github.com/zetsux/gin-gorm-template-clean/core/service"
 
 	"github.com/gin-gonic/gin"
 )
@@ -40,8 +42,8 @@ func (uc *userController) Register(ctx *gin.Context) {
 	var userDTO dto.UserRegisterRequest
 	err := ctx.ShouldBind(&userDTO)
 	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, standard.CreateFailResponse(
-			dto.MessageUserRegisterFailed,
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, base.CreateFailResponse(
+			messages.MessageUserRegisterFailed,
 			err.Error(), http.StatusBadRequest,
 		))
 		return
@@ -49,15 +51,15 @@ func (uc *userController) Register(ctx *gin.Context) {
 
 	newUser, err := uc.userService.CreateNewUser(ctx, userDTO)
 	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, standard.CreateFailResponse(
-			dto.MessageUserRegisterFailed,
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, base.CreateFailResponse(
+			messages.MessageUserRegisterFailed,
 			err.Error(), http.StatusBadRequest,
 		))
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, standard.CreateSuccessResponse(
-		dto.MessageUserRegisterSuccess,
+	ctx.JSON(http.StatusCreated, base.CreateSuccessResponse(
+		messages.MessageUserRegisterSuccess,
 		http.StatusCreated, newUser,
 	))
 }
@@ -66,8 +68,8 @@ func (uc *userController) Login(ctx *gin.Context) {
 	var userDTO dto.UserLoginRequest
 	err := ctx.ShouldBind(&userDTO)
 	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, standard.CreateFailResponse(
-			dto.MessageUserLoginFailed,
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, base.CreateFailResponse(
+			messages.MessageUserLoginFailed,
 			err.Error(), http.StatusBadRequest,
 		))
 		return
@@ -75,35 +77,35 @@ func (uc *userController) Login(ctx *gin.Context) {
 
 	res := uc.userService.VerifyLogin(ctx, userDTO.Email, userDTO.Password)
 	if !res {
-		ctx.AbortWithStatusJSON(http.StatusUnauthorized, standard.CreateFailResponse(
-			dto.MessageUserWrongCredential,
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized, base.CreateFailResponse(
+			messages.MessageUserWrongCredential,
 			"", http.StatusBadRequest,
 		))
 		return
 	}
 
-	user, err := uc.userService.GetUserByPrimaryKey(ctx, standard.DBAttrEmail, userDTO.Email)
+	user, err := uc.userService.GetUserByPrimaryKey(ctx, constant.DBAttrEmail, userDTO.Email)
 	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, standard.CreateFailResponse(
-			dto.MessageUserLoginFailed,
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, base.CreateFailResponse(
+			messages.MessageUserLoginFailed,
 			err.Error(), http.StatusBadRequest,
 		))
 		return
 	}
 
 	token := uc.jwtService.GenerateToken(user.ID, user.Role)
-	authResp := standard.CreateAuthResponse(token, user.Role)
-	ctx.JSON(http.StatusOK, standard.CreateSuccessResponse(
-		dto.MessageUserLoginSuccess,
+	authResp := base.CreateAuthResponse(token, user.Role)
+	ctx.JSON(http.StatusOK, base.CreateSuccessResponse(
+		messages.MessageUserLoginSuccess,
 		http.StatusOK, authResp,
 	))
 }
 
 func (uc *userController) GetAllUsers(ctx *gin.Context) {
-	var req standard.GetsRequest
+	var req base.GetsRequest
 	if err := ctx.ShouldBind(&req); err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, standard.CreateFailResponse(
-			dto.MessageUsersFetchFailed,
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, base.CreateFailResponse(
+			messages.MessageUsersFetchFailed,
 			err.Error(), http.StatusBadRequest,
 		))
 		return
@@ -111,21 +113,21 @@ func (uc *userController) GetAllUsers(ctx *gin.Context) {
 
 	users, pageMeta, err := uc.userService.GetAllUsers(ctx, req)
 	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, standard.CreateFailResponse(
-			dto.MessageUsersFetchFailed,
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, base.CreateFailResponse(
+			messages.MessageUsersFetchFailed,
 			err.Error(), http.StatusBadRequest,
 		))
 		return
 	}
 
-	if reflect.DeepEqual(pageMeta, standard.PaginationResponse{}) {
-		ctx.JSON(http.StatusOK, standard.CreateSuccessResponse(
-			dto.MessageUsersFetchSuccess,
+	if reflect.DeepEqual(pageMeta, base.PaginationResponse{}) {
+		ctx.JSON(http.StatusOK, base.CreateSuccessResponse(
+			messages.MessageUsersFetchSuccess,
 			http.StatusOK, users,
 		))
 	} else {
-		ctx.JSON(http.StatusOK, standard.CreatePaginatedResponse(
-			dto.MessageUsersFetchSuccess,
+		ctx.JSON(http.StatusOK, base.CreatePaginatedResponse(
+			messages.MessageUsersFetchSuccess,
 			http.StatusOK, users, pageMeta,
 		))
 	}
@@ -133,17 +135,17 @@ func (uc *userController) GetAllUsers(ctx *gin.Context) {
 
 func (uc *userController) GetMe(ctx *gin.Context) {
 	id := ctx.MustGet("ID").(string)
-	user, err := uc.userService.GetUserByPrimaryKey(ctx, standard.DBAttrID, id)
+	user, err := uc.userService.GetUserByPrimaryKey(ctx, constant.DBAttrID, id)
 	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, standard.CreateFailResponse(
-			dto.MessageUserFetchFailed,
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, base.CreateFailResponse(
+			messages.MessageUserFetchFailed,
 			err.Error(), http.StatusBadRequest,
 		))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, standard.CreateSuccessResponse(
-		dto.MessageUserFetchSuccess,
+	ctx.JSON(http.StatusOK, base.CreateSuccessResponse(
+		messages.MessageUserFetchSuccess,
 		http.StatusOK, user,
 	))
 }
@@ -152,8 +154,8 @@ func (uc *userController) UpdateSelfName(ctx *gin.Context) {
 	var userDTO dto.UserNameUpdateRequest
 	err := ctx.ShouldBind(&userDTO)
 	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, standard.CreateFailResponse(
-			dto.MessageUserUpdateFailed,
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, base.CreateFailResponse(
+			messages.MessageUserUpdateFailed,
 			err.Error(), http.StatusBadRequest,
 		))
 		return
@@ -162,15 +164,15 @@ func (uc *userController) UpdateSelfName(ctx *gin.Context) {
 	id := ctx.MustGet("ID").(string)
 	user, err := uc.userService.UpdateSelfName(ctx, userDTO, id)
 	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, standard.CreateFailResponse(
-			dto.MessageUserUpdateFailed,
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, base.CreateFailResponse(
+			messages.MessageUserUpdateFailed,
 			err.Error(), http.StatusBadRequest,
 		))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, standard.CreateSuccessResponse(
-		dto.MessageUserUpdateSuccess,
+	ctx.JSON(http.StatusOK, base.CreateSuccessResponse(
+		messages.MessageUserUpdateSuccess,
 		http.StatusOK, user,
 	))
 }
@@ -181,8 +183,8 @@ func (uc *userController) UpdateUserByID(ctx *gin.Context) {
 	var userDTO dto.UserUpdateRequest
 	err := ctx.ShouldBind(&userDTO)
 	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, standard.CreateFailResponse(
-			dto.MessageUserUpdateFailed,
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, base.CreateFailResponse(
+			messages.MessageUserUpdateFailed,
 			err.Error(), http.StatusBadRequest,
 		))
 		return
@@ -190,15 +192,15 @@ func (uc *userController) UpdateUserByID(ctx *gin.Context) {
 
 	user, err := uc.userService.UpdateUserByID(ctx, userDTO, id)
 	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, standard.CreateFailResponse(
-			dto.MessageUserUpdateFailed,
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, base.CreateFailResponse(
+			messages.MessageUserUpdateFailed,
 			err.Error(), http.StatusBadRequest,
 		))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, standard.CreateSuccessResponse(
-		dto.MessageUserUpdateSuccess,
+	ctx.JSON(http.StatusOK, base.CreateSuccessResponse(
+		messages.MessageUserUpdateSuccess,
 		http.StatusOK, user,
 	))
 }
@@ -207,15 +209,15 @@ func (uc *userController) DeleteSelfUser(ctx *gin.Context) {
 	id := ctx.MustGet("ID").(string)
 	err := uc.userService.DeleteUserByID(ctx, id)
 	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, standard.CreateFailResponse(
-			dto.MessageUserDeleteFailed,
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, base.CreateFailResponse(
+			messages.MessageUserDeleteFailed,
 			err.Error(), http.StatusBadRequest,
 		))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, standard.CreateSuccessResponse(
-		dto.MessageUserDeleteSuccess,
+	ctx.JSON(http.StatusOK, base.CreateSuccessResponse(
+		messages.MessageUserDeleteSuccess,
 		http.StatusOK, nil,
 	))
 }
@@ -224,15 +226,15 @@ func (uc *userController) DeleteUserByID(ctx *gin.Context) {
 	id := ctx.Param("user_id")
 	err := uc.userService.DeleteUserByID(ctx, id)
 	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, standard.CreateFailResponse(
-			dto.MessageUserDeleteFailed,
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, base.CreateFailResponse(
+			messages.MessageUserDeleteFailed,
 			err.Error(), http.StatusBadRequest,
 		))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, standard.CreateSuccessResponse(
-		dto.MessageUserDeleteSuccess,
+	ctx.JSON(http.StatusOK, base.CreateSuccessResponse(
+		messages.MessageUserDeleteSuccess,
 		http.StatusOK, nil,
 	))
 }
@@ -243,8 +245,8 @@ func (uc *userController) ChangePicture(ctx *gin.Context) {
 	var userDTO dto.UserChangePictureRequest
 	err := ctx.ShouldBind(&userDTO)
 	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, standard.CreateFailResponse(
-			dto.MessageUserPictureUpdateFailed,
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, base.CreateFailResponse(
+			messages.MessageUserPictureUpdateFailed,
 			err.Error(), http.StatusBadRequest,
 		))
 		return
@@ -252,15 +254,15 @@ func (uc *userController) ChangePicture(ctx *gin.Context) {
 
 	res, err := uc.userService.ChangePicture(ctx, userDTO, id)
 	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, standard.CreateFailResponse(
-			dto.MessageUserPictureUpdateFailed,
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, base.CreateFailResponse(
+			messages.MessageUserPictureUpdateFailed,
 			err.Error(), http.StatusBadRequest,
 		))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, standard.CreateSuccessResponse(
-		dto.MessageUserPictureUpdateSuccess,
+	ctx.JSON(http.StatusOK, base.CreateSuccessResponse(
+		messages.MessageUserPictureUpdateSuccess,
 		http.StatusOK, res,
 	))
 }
@@ -269,15 +271,15 @@ func (uc *userController) DeletePicture(ctx *gin.Context) {
 	id := ctx.Param("user_id")
 	err := uc.userService.DeletePicture(ctx, id)
 	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, standard.CreateFailResponse(
-			dto.MessageUserPictureDeleteFailed,
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, base.CreateFailResponse(
+			messages.MessageUserPictureDeleteFailed,
 			err.Error(), http.StatusBadRequest,
 		))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, standard.CreateSuccessResponse(
-		dto.MessageUserPictureDeleteSuccess,
+	ctx.JSON(http.StatusOK, base.CreateSuccessResponse(
+		messages.MessageUserPictureDeleteSuccess,
 		http.StatusOK, nil,
 	))
 }

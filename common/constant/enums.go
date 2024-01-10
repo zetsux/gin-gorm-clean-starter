@@ -1,4 +1,4 @@
-package standard
+package constant
 
 const (
 	EnumRoleAdmin = "admin"
@@ -6,8 +6,4 @@ const (
 
 	DBAttrID    = "id"
 	DBAttrEmail = "email"
-
-	FileBasePath = "files"
-
-	DefaultPaginationLimit = 10
 )

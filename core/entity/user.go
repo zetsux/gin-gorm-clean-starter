@@ -1,14 +1,14 @@
 package entity
 
 import (
-	"github.com/zetsux/gin-gorm-template-clean/common/standard"
-	"github.com/zetsux/gin-gorm-template-clean/common/utils"
+	"github.com/zetsux/gin-gorm-template-clean/common/base"
+	"github.com/zetsux/gin-gorm-template-clean/common/util"
 
 	"gorm.io/gorm"
 )
 
 type User struct {
-	standard.Model
+	base.Model
 	Name     string `json:"name" gorm:"not null"`
 	Email    string `json:"email" gorm:"unique;not null"`
 	Password string `json:"password" gorm:"not null"`
@@ -18,7 +18,7 @@ type User struct {
 
 func (u *User) BeforeCreate(tx *gorm.DB) error {
 	var err error
-	u.Password, err = utils.PasswordHash(u.Password)
+	u.Password, err = util.PasswordHash(u.Password)
 	if err != nil {
 		return err
 	}
@@ -28,7 +28,7 @@ func (u *User) BeforeCreate(tx *gorm.DB) error {
 func (u *User) BeforeUpdate(tx *gorm.DB) error {
 	if u.Password != "" {
 		var err error
-		u.Password, err = utils.PasswordHash(u.Password)
+		u.Password, err = util.PasswordHash(u.Password)
 		if err != nil {
 			return err
 		}

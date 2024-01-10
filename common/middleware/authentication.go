@@ -5,8 +5,9 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/zetsux/gin-gorm-template-clean/common/standard"
-	"github.com/zetsux/gin-gorm-template-clean/internal/service"
+	"github.com/zetsux/gin-gorm-template-clean/common/base"
+	"github.com/zetsux/gin-gorm-template-clean/common/constant"
+	"github.com/zetsux/gin-gorm-template-clean/core/service"
 
 	"github.com/gin-gonic/gin"
 )
@@ -15,25 +16,25 @@ func Authenticate(jwtService service.JWTService, roles ...string) gin.HandlerFun
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
-			response := standard.CreateFailResponse("No token found", "", http.StatusUnauthorized)
+			response := base.CreateFailResponse("No token found", "", http.StatusUnauthorized)
 			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
 			return
 		}
 		if !strings.Contains(authHeader, "Bearer ") {
-			response := standard.CreateFailResponse("No token found", "", http.StatusUnauthorized)
+			response := base.CreateFailResponse("No token found", "", http.StatusUnauthorized)
 			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
 			return
 		}
 		authHeader = strings.ReplaceAll(authHeader, "Bearer ", "")
 		token, err := jwtService.ValidateToken(authHeader)
 		if err != nil {
-			response := standard.CreateFailResponse("Invalid token", "", http.StatusUnauthorized)
+			response := base.CreateFailResponse("Invalid token", "", http.StatusUnauthorized)
 			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
 			return
 		}
 
 		if !token.Valid {
-			response := standard.CreateFailResponse("Invalid token", "", http.StatusUnauthorized)
+			response := base.CreateFailResponse("Invalid token", "", http.StatusUnauthorized)
 			c.AbortWithStatusJSON(http.StatusForbidden, response)
 			return
 		}
@@ -41,11 +42,11 @@ func Authenticate(jwtService service.JWTService, roles ...string) gin.HandlerFun
 		// get role from token
 		idRes, roleRes, err := jwtService.GetAttrByToken(authHeader)
 		if err != nil {
-			response := standard.CreateFailResponse("Failed to process request", "", http.StatusUnauthorized)
+			response := base.CreateFailResponse("Failed to process request", "", http.StatusUnauthorized)
 			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
 			return
-		} else if roleRes != standard.EnumRoleAdmin && !slices.Contains(roles, roleRes) {
-			response := standard.CreateFailResponse("Action unauthorized", "", http.StatusUnauthorized)
+		} else if roleRes != constant.EnumRoleAdmin && !slices.Contains(roles, roleRes) {
+			response := base.CreateFailResponse("Action unauthorized", "", http.StatusUnauthorized)
 			c.AbortWithStatusJSON(http.StatusForbidden, response)
 			return
 		}
