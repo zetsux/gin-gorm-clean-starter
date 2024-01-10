@@ -11,7 +11,7 @@
 - [Pre-requisites](#pre-requisites)
 
   - [PostgreSQL Requirements](#postgresql-requirements)
-  - [Husky Requirements](#husky-requirements)
+  - [GitHooks Requirements](#githooks-requirements)
 
 - [How to Run?](#how-to-run)
 - [API Documentation (Postman)](#api-documentation-postman)
@@ -138,13 +138,13 @@ A Clean Architecture starter template for projects using Gin (Golang) and Postgr
 1. Create the database in PostgreSQL with the name equal to the value of DB_NAME in `.env`
 2. Use the command `CREATE EXTENSION IF NOT EXISTS "uuid-ossp";` on the database terminal
 
-### Husky Requirements
+### GitHooks Requirements
 
-> Note : Husky is not mandatory for this starter. Only do the steps below if you want to use it.
+> Note : GitHooks is not mandatory for this starter. Only do the steps below if you want to apply & use it.
 
-1. Install husky to GO ENV by executing `go install github.com/automation-co/husky@latest`
-2. Install golangci-lint as the Linter by executing `go install github.com/golangci/golangci-lint@latest`. Alternatively, you can follow the recommended method, which involves installing the binary from the [official source](https://golangci-lint.run/usage/install/#binaries)
-3. Install husky on the local repository by executing `husky install`
+1. Install golangci-lint as the linters aggregator for pre-commit linting by executing `go install github.com/golangci/golangci-lint@latest`. Alternatively, you can follow the recommended method, which involves installing the binary from the [official source](https://golangci-lint.run/usage/install/#binaries)
+2. Install commitlint as the conventional commit message checker by executing `go install github.com/conventionalcommit/commitlint@latest`. Alternatively, you can follow the recommended method, which involves installing the binary from the [official source](https://github.com/conventionalcommit/commitlint/releases)
+3. Configure your git's hooks path to be linked to the `.githooks` directory on this repository by executing `git config core.hooksPath .githooks`
 
 ## How to Run?
 
