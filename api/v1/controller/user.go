@@ -43,7 +43,7 @@ func (uc *userController) Register(ctx *gin.Context) {
 	err := ctx.ShouldBind(&userDTO)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, base.CreateFailResponse(
-			messages.MessageUserRegisterFailed,
+			messages.MsgUserRegisterFailed,
 			err.Error(), http.StatusBadRequest,
 		))
 		return
@@ -52,14 +52,14 @@ func (uc *userController) Register(ctx *gin.Context) {
 	newUser, err := uc.userService.CreateNewUser(ctx, userDTO)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, base.CreateFailResponse(
-			messages.MessageUserRegisterFailed,
+			messages.MsgUserRegisterFailed,
 			err.Error(), http.StatusBadRequest,
 		))
 		return
 	}
 
 	ctx.JSON(http.StatusCreated, base.CreateSuccessResponse(
-		messages.MessageUserRegisterSuccess,
+		messages.MsgUserRegisterSuccess,
 		http.StatusCreated, newUser,
 	))
 }
@@ -69,7 +69,7 @@ func (uc *userController) Login(ctx *gin.Context) {
 	err := ctx.ShouldBind(&userDTO)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, base.CreateFailResponse(
-			messages.MessageUserLoginFailed,
+			messages.MsgUserLoginFailed,
 			err.Error(), http.StatusBadRequest,
 		))
 		return
@@ -78,7 +78,7 @@ func (uc *userController) Login(ctx *gin.Context) {
 	res := uc.userService.VerifyLogin(ctx, userDTO.Email, userDTO.Password)
 	if !res {
 		ctx.AbortWithStatusJSON(http.StatusUnauthorized, base.CreateFailResponse(
-			messages.MessageUserWrongCredential,
+			messages.MsgUserWrongCredential,
 			"", http.StatusBadRequest,
 		))
 		return
@@ -87,7 +87,7 @@ func (uc *userController) Login(ctx *gin.Context) {
 	user, err := uc.userService.GetUserByPrimaryKey(ctx, constant.DBAttrEmail, userDTO.Email)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, base.CreateFailResponse(
-			messages.MessageUserLoginFailed,
+			messages.MsgUserLoginFailed,
 			err.Error(), http.StatusBadRequest,
 		))
 		return
@@ -96,7 +96,7 @@ func (uc *userController) Login(ctx *gin.Context) {
 	token := uc.jwtService.GenerateToken(user.ID, user.Role)
 	authResp := base.CreateAuthResponse(token, user.Role)
 	ctx.JSON(http.StatusOK, base.CreateSuccessResponse(
-		messages.MessageUserLoginSuccess,
+		messages.MsgUserLoginSuccess,
 		http.StatusOK, authResp,
 	))
 }
@@ -105,7 +105,7 @@ func (uc *userController) GetAllUsers(ctx *gin.Context) {
 	var req base.GetsRequest
 	if err := ctx.ShouldBind(&req); err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, base.CreateFailResponse(
-			messages.MessageUsersFetchFailed,
+			messages.MsgUsersFetchFailed,
 			err.Error(), http.StatusBadRequest,
 		))
 		return
@@ -114,7 +114,7 @@ func (uc *userController) GetAllUsers(ctx *gin.Context) {
 	users, pageMeta, err := uc.userService.GetAllUsers(ctx, req)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, base.CreateFailResponse(
-			messages.MessageUsersFetchFailed,
+			messages.MsgUsersFetchFailed,
 			err.Error(), http.StatusBadRequest,
 		))
 		return
@@ -122,12 +122,12 @@ func (uc *userController) GetAllUsers(ctx *gin.Context) {
 
 	if reflect.DeepEqual(pageMeta, base.PaginationResponse{}) {
 		ctx.JSON(http.StatusOK, base.CreateSuccessResponse(
-			messages.MessageUsersFetchSuccess,
+			messages.MsgUsersFetchSuccess,
 			http.StatusOK, users,
 		))
 	} else {
 		ctx.JSON(http.StatusOK, base.CreatePaginatedResponse(
-			messages.MessageUsersFetchSuccess,
+			messages.MsgUsersFetchSuccess,
 			http.StatusOK, users, pageMeta,
 		))
 	}
@@ -138,14 +138,14 @@ func (uc *userController) GetMe(ctx *gin.Context) {
 	user, err := uc.userService.GetUserByPrimaryKey(ctx, constant.DBAttrID, id)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, base.CreateFailResponse(
-			messages.MessageUserFetchFailed,
+			messages.MsgUserFetchFailed,
 			err.Error(), http.StatusBadRequest,
 		))
 		return
 	}
 
 	ctx.JSON(http.StatusOK, base.CreateSuccessResponse(
-		messages.MessageUserFetchSuccess,
+		messages.MsgUserFetchSuccess,
 		http.StatusOK, user,
 	))
 }
@@ -155,7 +155,7 @@ func (uc *userController) UpdateSelfName(ctx *gin.Context) {
 	err := ctx.ShouldBind(&userDTO)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, base.CreateFailResponse(
-			messages.MessageUserUpdateFailed,
+			messages.MsgUserUpdateFailed,
 			err.Error(), http.StatusBadRequest,
 		))
 		return
@@ -165,14 +165,14 @@ func (uc *userController) UpdateSelfName(ctx *gin.Context) {
 	user, err := uc.userService.UpdateSelfName(ctx, userDTO, id)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, base.CreateFailResponse(
-			messages.MessageUserUpdateFailed,
+			messages.MsgUserUpdateFailed,
 			err.Error(), http.StatusBadRequest,
 		))
 		return
 	}
 
 	ctx.JSON(http.StatusOK, base.CreateSuccessResponse(
-		messages.MessageUserUpdateSuccess,
+		messages.MsgUserUpdateSuccess,
 		http.StatusOK, user,
 	))
 }
@@ -184,7 +184,7 @@ func (uc *userController) UpdateUserByID(ctx *gin.Context) {
 	err := ctx.ShouldBind(&userDTO)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, base.CreateFailResponse(
-			messages.MessageUserUpdateFailed,
+			messages.MsgUserUpdateFailed,
 			err.Error(), http.StatusBadRequest,
 		))
 		return
@@ -193,14 +193,14 @@ func (uc *userController) UpdateUserByID(ctx *gin.Context) {
 	user, err := uc.userService.UpdateUserByID(ctx, userDTO, id)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, base.CreateFailResponse(
-			messages.MessageUserUpdateFailed,
+			messages.MsgUserUpdateFailed,
 			err.Error(), http.StatusBadRequest,
 		))
 		return
 	}
 
 	ctx.JSON(http.StatusOK, base.CreateSuccessResponse(
-		messages.MessageUserUpdateSuccess,
+		messages.MsgUserUpdateSuccess,
 		http.StatusOK, user,
 	))
 }
@@ -210,14 +210,14 @@ func (uc *userController) DeleteSelfUser(ctx *gin.Context) {
 	err := uc.userService.DeleteUserByID(ctx, id)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, base.CreateFailResponse(
-			messages.MessageUserDeleteFailed,
+			messages.MsgUserDeleteFailed,
 			err.Error(), http.StatusBadRequest,
 		))
 		return
 	}
 
 	ctx.JSON(http.StatusOK, base.CreateSuccessResponse(
-		messages.MessageUserDeleteSuccess,
+		messages.MsgUserDeleteSuccess,
 		http.StatusOK, nil,
 	))
 }
@@ -227,14 +227,14 @@ func (uc *userController) DeleteUserByID(ctx *gin.Context) {
 	err := uc.userService.DeleteUserByID(ctx, id)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, base.CreateFailResponse(
-			messages.MessageUserDeleteFailed,
+			messages.MsgUserDeleteFailed,
 			err.Error(), http.StatusBadRequest,
 		))
 		return
 	}
 
 	ctx.JSON(http.StatusOK, base.CreateSuccessResponse(
-		messages.MessageUserDeleteSuccess,
+		messages.MsgUserDeleteSuccess,
 		http.StatusOK, nil,
 	))
 }
@@ -246,7 +246,7 @@ func (uc *userController) ChangePicture(ctx *gin.Context) {
 	err := ctx.ShouldBind(&userDTO)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, base.CreateFailResponse(
-			messages.MessageUserPictureUpdateFailed,
+			messages.MsgUserPictureUpdateFailed,
 			err.Error(), http.StatusBadRequest,
 		))
 		return
@@ -255,14 +255,14 @@ func (uc *userController) ChangePicture(ctx *gin.Context) {
 	res, err := uc.userService.ChangePicture(ctx, userDTO, id)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, base.CreateFailResponse(
-			messages.MessageUserPictureUpdateFailed,
+			messages.MsgUserPictureUpdateFailed,
 			err.Error(), http.StatusBadRequest,
 		))
 		return
 	}
 
 	ctx.JSON(http.StatusOK, base.CreateSuccessResponse(
-		messages.MessageUserPictureUpdateSuccess,
+		messages.MsgUserPictureUpdateSuccess,
 		http.StatusOK, res,
 	))
 }
@@ -272,14 +272,14 @@ func (uc *userController) DeletePicture(ctx *gin.Context) {
 	err := uc.userService.DeletePicture(ctx, id)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, base.CreateFailResponse(
-			messages.MessageUserPictureDeleteFailed,
+			messages.MsgUserPictureDeleteFailed,
 			err.Error(), http.StatusBadRequest,
 		))
 		return
 	}
 
 	ctx.JSON(http.StatusOK, base.CreateSuccessResponse(
-		messages.MessageUserPictureDeleteSuccess,
+		messages.MsgUserPictureDeleteSuccess,
 		http.StatusOK, nil,
 	))
 }

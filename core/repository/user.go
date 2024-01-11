@@ -7,7 +7,7 @@ import (
 
 	"github.com/zetsux/gin-gorm-template-clean/common/base"
 	"github.com/zetsux/gin-gorm-template-clean/core/entity"
-	"github.com/zetsux/gin-gorm-template-clean/core/helper/errs"
+	errs "github.com/zetsux/gin-gorm-template-clean/core/helper/errors"
 
 	"gorm.io/gorm"
 )

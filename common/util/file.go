@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/zetsux/gin-gorm-template-clean/common/constant"
-	"github.com/zetsux/gin-gorm-template-clean/core/helper/errs"
+	errs "github.com/zetsux/gin-gorm-template-clean/core/helper/errors"
 )
 
 func UploadFile(file *multipart.FileHeader, path string) error {

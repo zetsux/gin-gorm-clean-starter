@@ -11,7 +11,7 @@ import (
 	"github.com/zetsux/gin-gorm-template-clean/common/util"
 	"github.com/zetsux/gin-gorm-template-clean/core/entity"
 	"github.com/zetsux/gin-gorm-template-clean/core/helper/dto"
-	"github.com/zetsux/gin-gorm-template-clean/core/helper/errs"
+	errs "github.com/zetsux/gin-gorm-template-clean/core/helper/errors"
 	"github.com/zetsux/gin-gorm-template-clean/core/repository"
 
 	"github.com/jinzhu/copier"

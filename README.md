@@ -66,7 +66,7 @@ A Clean Architecture starter template for projects using Gin (Golang) and Postgr
 │   │   ├── /dto
 │   │   │   ├── user.go
 │   │   │   └── etc
-│   │   ├── /errs
+│   │   ├── /errors
 │   │   │   ├── other.go
 │   │   │   ├── user.go
 │   │   │   └── etc
@@ -111,7 +111,7 @@ A Clean Architecture starter template for projects using Gin (Golang) and Postgr
   - `/helper` : The directory to store things that will be used to help the Back End side operates. It consist of useful things such as DTOs, error variables, and message constants.
 
     - `/dto` : The directory to store DTO (Data Transfer Object) which is a placeholder for other objects, mainly to store data for requests and responses.
-    - `/errs` : The directory to store stores error variables for each entity and other needs.
+    - `/errors` : The directory to store stores error variables for each entity and other needs.
     - `/messages` : The directory to store message constants for each entity.
 
   - `/repository` : The directory for things related to the Repository layer which is the layer that is responsible to interact directly with the database.
@@ -142,7 +142,7 @@ A Clean Architecture starter template for projects using Gin (Golang) and Postgr
   - `/helper` : The directory to store things that will be used to help the Back End side operates. It consist of useful things such as DTOs, error variables, and message constants.
 
     - `/dto` : Directory untuk menyimpan DTO (Data Transfer Object) adalah placeholder untuk suatu object lain yang digunakan untuk menampung data request dan response.
-    - `/errs` : Directory untuk menyimpan variabel-variabel error untuk baik yang spesifik untuk setiap entitas maupun yang lain.
+    - `/errors` : Directory untuk menyimpan variabel-variabel error untuk baik yang spesifik untuk setiap entitas maupun yang lain.
     - `/messages` : Directory untuk menyimpan konstanta pesan untuk digunakan dalam response API.
 
   - `/repository` : Directory untuk menyimpan hal-hal terkait Repository yang merupakan lapisan yang berhubungan langsung dengan database.

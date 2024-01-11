@@ -1,27 +1,27 @@
 package messages
 
 const (
-	MessageUserRegisterSuccess = "User register successful"
-	MessageUserRegisterFailed  = "Failed to process user register request"
+	MsgUserRegisterSuccess = "User register successful"
+	MsgUserRegisterFailed  = "Failed to process user register request"
 
-	MessageUserLoginSuccess    = "User login successful"
-	MessageUserLoginFailed     = "Failed to process user login request"
-	MessageUserWrongCredential = "Entered credentials invalid"
+	MsgUserLoginSuccess    = "User login successful"
+	MsgUserLoginFailed     = "Failed to process user login request"
+	MsgUserWrongCredential = "Entered credentials invalid"
 
-	MessageUsersFetchSuccess = "Users fetched successfully"
-	MessageUsersFetchFailed  = "Failed to fetch users"
-	MessageUserFetchSuccess  = "User fetched successfully"
-	MessageUserFetchFailed   = "Failed to fetch user"
+	MsgUsersFetchSuccess = "Users fetched successfully"
+	MsgUsersFetchFailed  = "Failed to fetch users"
+	MsgUserFetchSuccess  = "User fetched successfully"
+	MsgUserFetchFailed   = "Failed to fetch user"
 
-	MessageUserUpdateSuccess = "User update successful"
-	MessageUserUpdateFailed  = "Failed to process user update request"
+	MsgUserUpdateSuccess = "User update successful"
+	MsgUserUpdateFailed  = "Failed to process user update request"
 
-	MessageUserDeleteSuccess = "User delete successful"
-	MessageUserDeleteFailed  = "Failed to process user delete request"
+	MsgUserDeleteSuccess = "User delete successful"
+	MsgUserDeleteFailed  = "Failed to process user delete request"
 
-	MessageUserPictureUpdateSuccess = "User picture update successful"
-	MessageUserPictureUpdateFailed  = "Failed to process user picture update request"
+	MsgUserPictureUpdateSuccess = "User picture update successful"
+	MsgUserPictureUpdateFailed  = "Failed to process user picture update request"
 
-	MessageUserPictureDeleteSuccess = "User picture delete successful"
-	MessageUserPictureDeleteFailed  = "Failed to process user picture delete request"
+	MsgUserPictureDeleteSuccess = "User picture delete successful"
+	MsgUserPictureDeleteFailed  = "Failed to process user picture delete request"
 )
