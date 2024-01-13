@@ -13,8 +13,6 @@ import (
 	"github.com/zetsux/gin-gorm-template-clean/core/helper/dto"
 	errs "github.com/zetsux/gin-gorm-template-clean/core/helper/errors"
 	"github.com/zetsux/gin-gorm-template-clean/core/repository"
-
-	"github.com/jinzhu/copier"
 )
 
 type userService struct {
@@ -63,14 +61,11 @@ func (us *userService) CreateNewUser(ctx context.Context, ud dto.UserRegisterReq
 		return dto.UserResponse{}, errs.ErrEmailAlreadyExists
 	}
 
-	// Fill user role
-	ud.Role = constant.EnumRoleUser
-
-	// Copy UserDTO to empty newly created user var
-	var user entity.User
-	err = copier.Copy(&user, &ud)
-	if err != nil {
-		return dto.UserResponse{}, err
+	user := entity.User{
+		Name:     ud.Name,
+		Email:    ud.Email,
+		Password: ud.Password,
+		Role:     constant.EnumRoleUser,
 	}
 
 	// create new user
