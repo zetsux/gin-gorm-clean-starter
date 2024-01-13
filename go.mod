@@ -1,4 +1,4 @@
-module github.com/zetsux/gin-gorm-template-clean
+module github.com/zetsux/gin-gorm-clean-starter
 
 go 1.20
 

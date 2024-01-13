@@ -1,8 +1,8 @@
 package entity
 
 import (
-	"github.com/zetsux/gin-gorm-template-clean/common/base"
-	"github.com/zetsux/gin-gorm-template-clean/common/util"
+	"github.com/zetsux/gin-gorm-clean-starter/common/base"
+	"github.com/zetsux/gin-gorm-clean-starter/common/util"
 
 	"gorm.io/gorm"
 )

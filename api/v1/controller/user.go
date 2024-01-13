@@ -4,11 +4,11 @@ import (
 	"net/http"
 	"reflect"
 
-	"github.com/zetsux/gin-gorm-template-clean/common/base"
-	"github.com/zetsux/gin-gorm-template-clean/common/constant"
-	"github.com/zetsux/gin-gorm-template-clean/core/helper/dto"
-	"github.com/zetsux/gin-gorm-template-clean/core/helper/messages"
-	"github.com/zetsux/gin-gorm-template-clean/core/service"
+	"github.com/zetsux/gin-gorm-clean-starter/common/base"
+	"github.com/zetsux/gin-gorm-clean-starter/common/constant"
+	"github.com/zetsux/gin-gorm-clean-starter/core/helper/dto"
+	"github.com/zetsux/gin-gorm-clean-starter/core/helper/messages"
+	"github.com/zetsux/gin-gorm-clean-starter/core/service"
 
 	"github.com/gin-gonic/gin"
 )

@@ -6,13 +6,13 @@ import (
 	"reflect"
 
 	"github.com/google/uuid"
-	"github.com/zetsux/gin-gorm-template-clean/common/base"
-	"github.com/zetsux/gin-gorm-template-clean/common/constant"
-	"github.com/zetsux/gin-gorm-template-clean/common/util"
-	"github.com/zetsux/gin-gorm-template-clean/core/entity"
-	"github.com/zetsux/gin-gorm-template-clean/core/helper/dto"
-	errs "github.com/zetsux/gin-gorm-template-clean/core/helper/errors"
-	"github.com/zetsux/gin-gorm-template-clean/core/repository"
+	"github.com/zetsux/gin-gorm-clean-starter/common/base"
+	"github.com/zetsux/gin-gorm-clean-starter/common/constant"
+	"github.com/zetsux/gin-gorm-clean-starter/common/util"
+	"github.com/zetsux/gin-gorm-clean-starter/core/entity"
+	"github.com/zetsux/gin-gorm-clean-starter/core/helper/dto"
+	errs "github.com/zetsux/gin-gorm-clean-starter/core/helper/errors"
+	"github.com/zetsux/gin-gorm-clean-starter/core/repository"
 )
 
 type userService struct {

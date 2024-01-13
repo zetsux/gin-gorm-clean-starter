@@ -5,9 +5,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/zetsux/gin-gorm-template-clean/common/base"
-	"github.com/zetsux/gin-gorm-template-clean/common/constant"
-	"github.com/zetsux/gin-gorm-template-clean/core/helper/messages"
+	"github.com/zetsux/gin-gorm-clean-starter/common/base"
+	"github.com/zetsux/gin-gorm-clean-starter/common/constant"
+	"github.com/zetsux/gin-gorm-clean-starter/core/helper/messages"
 
 	"github.com/gin-gonic/gin"
 )
