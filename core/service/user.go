@@ -96,7 +96,7 @@ func (us *userService) GetAllUsers(ctx context.Context, req base.GetsRequest) (
 		req.Sort = req.Sort[1:] + " DESC"
 	}
 
-	users, lastPage, total, err := us.userRepository.GetAllUsers(ctx, req, nil)
+	users, lastPage, total, err := us.userRepository.GetAllUsers(ctx, nil, req)
 	if err != nil {
 		return []dto.UserResponse{}, base.PaginationResponse{}, err
 	}

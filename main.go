@@ -18,8 +18,9 @@ func main() {
 	var (
 		db   = config.DBSetup()
 		jwtS = service.NewJWTService()
+		txR  = repository.NewTxRepository(db)
 
-		userR = repository.NewUserRepository(db)
+		userR = repository.NewUserRepository(txR)
 		userS = service.NewUserService(userR)
 		userC = controller.NewUserController(userS, jwtS)
 
