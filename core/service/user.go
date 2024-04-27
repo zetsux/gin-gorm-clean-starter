@@ -180,12 +180,12 @@ func (us *userService) UpdateUserByID(ctx context.Context,
 	}
 
 	userEdit := entity.User{
+		ID:       user.ID,
 		Name:     ud.Name,
 		Email:    ud.Email,
 		Role:     ud.Role,
 		Password: ud.Password,
 	}
-	userEdit.ID = user.ID
 
 	edited, err := us.userRepository.UpdateUser(ctx, nil, userEdit)
 	if err != nil {
@@ -249,9 +249,9 @@ func (us *userService) ChangePicture(ctx context.Context,
 	picPath := fmt.Sprintf("user_picture/%v", picID)
 
 	userEdit := entity.User{
+		ID:      user.ID,
 		Picture: picPath,
 	}
-	userEdit.ID = user.ID
 
 	if err := util.UploadFile(req.Picture, picPath); err != nil {
 		return dto.UserResponse{}, err
@@ -287,9 +287,9 @@ func (us *userService) DeletePicture(ctx context.Context, userID string) error {
 	}
 
 	userEdit := entity.User{
+		ID:      user.ID,
 		Picture: "",
 	}
-	userEdit.ID = user.ID
 
 	_, err = us.userRepository.UpdateUser(ctx, nil, userEdit)
 	if err != nil {
