@@ -83,7 +83,7 @@ func (us *userService) CreateNewUser(ctx context.Context, ud dto.UserRegisterReq
 }
 
 func (us *userService) GetAllUsers(ctx context.Context, req base.GetsRequest) (
-	userResp []dto.UserResponse, pageResp base.PaginationResponse, err error) {
+	usersResp []dto.UserResponse, pageResp base.PaginationResponse, err error) {
 	if req.Limit < 0 {
 		req.Limit = 0
 	}
@@ -102,17 +102,21 @@ func (us *userService) GetAllUsers(ctx context.Context, req base.GetsRequest) (
 	}
 
 	for _, user := range users {
-		userResp = append(userResp, dto.UserResponse{
-			ID:      user.ID.String(),
-			Name:    user.Name,
-			Email:   user.Email,
-			Role:    user.Role,
-			Picture: user.Picture,
-		})
+		userResp := dto.UserResponse{
+			ID:    user.ID.String(),
+			Name:  user.Name,
+			Email: user.Email,
+			Role:  user.Role,
+		}
+		if user.Picture != nil {
+			userResp.Picture = *user.Picture
+		}
+
+		usersResp = append(usersResp, userResp)
 	}
 
 	if req.Limit == 0 {
-		return userResp, base.PaginationResponse{}, nil
+		return usersResp, base.PaginationResponse{}, nil
 	}
 
 	pageResp = base.PaginationResponse{
@@ -121,7 +125,7 @@ func (us *userService) GetAllUsers(ctx context.Context, req base.GetsRequest) (
 		LastPage: lastPage,
 		Total:    total,
 	}
-	return userResp, pageResp, nil
+	return usersResp, pageResp, nil
 }
 
 func (us *userService) GetUserByPrimaryKey(ctx context.Context, key string, val string) (dto.UserResponse, error) {
@@ -130,13 +134,17 @@ func (us *userService) GetUserByPrimaryKey(ctx context.Context, key string, val 
 		return dto.UserResponse{}, err
 	}
 
-	return dto.UserResponse{
-		ID:      user.ID.String(),
-		Name:    user.Name,
-		Email:   user.Email,
-		Role:    user.Role,
-		Picture: user.Picture,
-	}, nil
+	userResp := dto.UserResponse{
+		ID:    user.ID.String(),
+		Name:  user.Name,
+		Email: user.Email,
+		Role:  user.Role,
+	}
+	if user.Picture != nil {
+		userResp.Picture = *user.Picture
+	}
+
+	return userResp, nil
 }
 
 func (us *userService) UpdateSelfName(ctx context.Context,
@@ -203,11 +211,10 @@ func (us *userService) UpdateUserByID(ctx context.Context,
 	}
 
 	return dto.UserResponse{
-		ID:      edited.ID.String(),
-		Name:    edited.Name,
-		Email:   edited.Email,
-		Role:    edited.Role,
-		Picture: user.Picture,
+		ID:    edited.ID.String(),
+		Name:  edited.Name,
+		Email: edited.Email,
+		Role:  edited.Role,
 	}, nil
 }
 
@@ -239,8 +246,8 @@ func (us *userService) ChangePicture(ctx context.Context,
 		return dto.UserResponse{}, errs.ErrUserNotFound
 	}
 
-	if user.Picture != "" {
-		if err := util.DeleteFile(user.Picture); err != nil {
+	if *user.Picture != "" {
+		if err := util.DeleteFile(*user.Picture); err != nil {
 			return dto.UserResponse{}, err
 		}
 	}
@@ -250,7 +257,7 @@ func (us *userService) ChangePicture(ctx context.Context,
 
 	userEdit := entity.User{
 		ID:      user.ID,
-		Picture: picPath,
+		Picture: &picPath,
 	}
 
 	if err := util.UploadFile(req.Picture, picPath); err != nil {
@@ -264,7 +271,7 @@ func (us *userService) ChangePicture(ctx context.Context,
 
 	return dto.UserResponse{
 		ID:      userUpdate.ID.String(),
-		Picture: userUpdate.Picture,
+		Picture: *userUpdate.Picture,
 	}, nil
 }
 
@@ -278,17 +285,18 @@ func (us *userService) DeletePicture(ctx context.Context, userID string) error {
 		return errs.ErrUserNotFound
 	}
 
-	if user.Picture == "" {
+	if user.Picture == nil || *user.Picture == "" {
 		return errs.ErrUserNoPicture
 	}
 
-	if err := util.DeleteFile(user.Picture); err != nil {
+	if err := util.DeleteFile(*user.Picture); err != nil {
 		return err
 	}
 
+	emptyString := ""
 	userEdit := entity.User{
 		ID:      user.ID,
-		Picture: "",
+		Picture: &emptyString,
 	}
 
 	_, err = us.userRepository.UpdateUser(ctx, nil, userEdit)

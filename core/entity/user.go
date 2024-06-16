@@ -14,7 +14,7 @@ type User struct {
 	Email    string    `json:"email" gorm:"unique;not null"`
 	Password string    `json:"password" gorm:"not null"`
 	Role     string    `json:"role" gorm:"not null"`
-	Picture  string    `json:"picture"`
+	Picture  *string   `json:"picture"`
 	base.Model
 }
 
