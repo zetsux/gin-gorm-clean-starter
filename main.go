@@ -16,15 +16,16 @@ import (
 
 func main() {
 	var (
-		db   = config.DBSetup()
-		jwtS = service.NewJWTService()
-		txR  = repository.NewTxRepository(db)
+		db = config.DBSetup()
 
+		txR   = repository.NewTxRepository(db)
 		userR = repository.NewUserRepository(txR)
+
+		jwtS  = service.NewJWTService()
 		userS = service.NewUserService(userR)
-		userC = controller.NewUserController(userS, jwtS)
 
 		fileC = controller.NewFileController()
+		userC = controller.NewUserController(userS, jwtS)
 	)
 
 	defer config.DBClose(db)
@@ -36,8 +37,8 @@ func main() {
 	)
 
 	// Setting Up Routes
-	router.UserRouter(server, userC, jwtS)
 	router.FileRouter(server, fileC)
+	router.UserRouter(server, userC, jwtS)
 
 	// Running in localhost:8080
 	port := os.Getenv("PORT")

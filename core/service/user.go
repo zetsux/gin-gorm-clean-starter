@@ -246,7 +246,7 @@ func (us *userService) ChangePicture(ctx context.Context,
 		return dto.UserResponse{}, errs.ErrUserNotFound
 	}
 
-	if *user.Picture != "" {
+	if user.Picture != nil && *user.Picture != "" {
 		if err := util.DeleteFile(*user.Picture); err != nil {
 			return dto.UserResponse{}, err
 		}
