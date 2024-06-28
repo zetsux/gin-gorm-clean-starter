@@ -3,5 +3,5 @@ package constant
 const (
 	FileBasePath = "files"
 
-	DefaultPaginationLimit = 10
+	DefaultPaginationPerPage = 10
 )

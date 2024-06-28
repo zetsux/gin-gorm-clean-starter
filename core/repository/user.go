@@ -95,14 +95,14 @@ func (ur *userRepository) GetAllUsers(ctx context.Context, tx *gorm.DB,
 		stmt = stmt.Order(req.Sort)
 	}
 
-	lastPage := int64(math.Ceil(float64(total) / float64(req.Limit)))
-	if req.Limit == 0 {
+	lastPage := int64(math.Ceil(float64(total) / float64(req.PerPage)))
+	if req.PerPage == 0 {
 		err = stmt.Find(&users).Error
 	} else {
 		if req.Page <= 0 || int64(req.Page) > lastPage {
 			return nil, 0, 0, errs.ErrInvalidPage
 		}
-		err = stmt.Offset(((req.Page - 1) * req.Limit)).Limit(req.Limit).Find(&users).Error
+		err = stmt.Offset(((req.Page - 1) * req.PerPage)).Limit(req.PerPage).Find(&users).Error
 	}
 
 	if err != nil && !(errors.Is(err, gorm.ErrRecordNotFound)) {

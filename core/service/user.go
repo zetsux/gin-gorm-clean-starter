@@ -84,8 +84,8 @@ func (us *userService) CreateNewUser(ctx context.Context, ud dto.UserRegisterReq
 
 func (us *userService) GetAllUsers(ctx context.Context, req base.GetsRequest) (
 	usersResp []dto.UserResponse, pageResp base.PaginationResponse, err error) {
-	if req.Limit < 0 {
-		req.Limit = 0
+	if req.PerPage < 0 {
+		req.PerPage = 0
 	}
 
 	if req.Page < 0 {
@@ -115,13 +115,13 @@ func (us *userService) GetAllUsers(ctx context.Context, req base.GetsRequest) (
 		usersResp = append(usersResp, userResp)
 	}
 
-	if req.Limit == 0 {
+	if req.PerPage == 0 {
 		return usersResp, base.PaginationResponse{}, nil
 	}
 
 	pageResp = base.PaginationResponse{
 		Page:     int64(req.Page),
-		Limit:    int64(req.Limit),
+		PerPage:  int64(req.PerPage),
 		LastPage: lastPage,
 		Total:    total,
 	}

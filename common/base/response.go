@@ -16,7 +16,7 @@ type AuthResponse struct {
 
 type PaginationResponse struct {
 	Page     int64 `json:"page"`
-	Limit    int64 `json:"limit"`
+	PerPage  int64 `json:"per_page"`
 	LastPage int64 `json:"last_page"`
 	Total    int64 `json:"total"`
 }
